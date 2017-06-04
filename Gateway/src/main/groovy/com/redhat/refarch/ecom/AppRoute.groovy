@@ -15,57 +15,78 @@
  */
 package com.redhat.refarch.ecom
 
-import com.redhat.refarch.ecom.service.CustomerService
 import org.apache.camel.spring.SpringRouteBuilder
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class AppRoute extends SpringRouteBuilder {
 
-    @Autowired
-    CustomerService customerService
-
     @Override
     void configure() throws Exception {
 
-        from("amq:customers.authenticate")
-                .bean(customerService, "authenticate")
+        restConfiguration().component("spark-rest").host("0.0.0.0").port(9091)
 
-        from("amq:customers.get")
-                .bean(customerService, "getCustomer")
+        rest("/billing/process")
+                .post().route()
+                .to("amq:billing.process?transferException=true")
+                .wireTap("direct:warehouse")
 
-        from("amq:customers.save")
-                .bean(customerService, "saveCustomer")
+        from("direct:warehouse")
+                .routeId("warehouseMsgGateway")
+                .filter(simple("${bodyAs(String)} contains 'SUCCESS'"))
+                .inOnly("amq:topic:warehouse.fulfill")
 
-        from("amq:customers.delete")
-                .bean(customerService, "deleteCustomer")
+        rest("/billing/refund/{transactionNumber}")
+                .post().to("amq:billing.refund?transferException=true")
 
-        from("amq:customers.orders.getOne")
-                .bean(customerService, "getOrder")
+        rest("/customers")
+                .put().to("amq:customers.save?transferException=true")
+                .patch().to("amq:customers.save?transferException=true")
+                .delete().to("amq:customers.delete?transferException=true")
 
-        from("amq:customers.orders.getAll")
-                .bean(customerService, "getOrders")
+        rest("/customers/authenticate")
+                .post().to("amq:customers.authenticate?transferException=true")
 
-        from("amq:customers.orders.save")
-                .bean(customerService, "saveOrder")
+        rest("/customers/{customerId}")
+                .get().to("amq:customers.get?transferException=true")
 
-        from("amq:customers.orders.delete")
-                .bean(customerService, "deleteOrder")
+        rest("/customers/{customerId}/orders")
+                .get().to("amq:customers.orders.list?transferException=true")
+                .put().to("amq:customers.orders.save?transferException=true")
+                .patch().to("amq:customers.orders.save?transferException=true")
+                .delete().to("amq:customers.orders.delete?transferException=true")
 
-        from("amq:customers.orderItems.getOne")
-                .bean(customerService, "getOrderItem")
+        rest("/customers/{customerId}/orders/{orderId}")
+                .get().to("amq:customers.orders.get?transferException=true")
 
-        from("amq:customers.orderItems.getAll")
-                .bean(customerService, "getOrderItems")
+        rest("/customers/{customerId}/orders/{orderId}/orderItems")
+                .get().to("amq:customers.orders.orderItems.list?transferException=true")
+                .put().to("amq:customers.orders.orderItems.save?transferException=true")
+                .patch().to("amq:customers.orders.orderItems.save?transferException=true")
+                .delete().to("amq:customers.orders.orderItems.delete?transferException=true")
 
-        from("amq:customers.orderItems.saveOne")
-                .bean(customerService, "saveOrderItemById")
+        rest("/customers/{customerId}/orders/{orderId}/orderItems/{orderItemId}")
+                .get().to("amq:customers.orders.orderItems.get?transferException=true")
 
-        from("amq:customers.orderItems.saveAll")
-                .bean(customerService, "saveOrderItem")
+        rest("/products")
+                .get().to("amq:products.list.featured?transferException=true")
+                .put().to("amq:products.save?transferException=true")
+                .patch().to("amq:products.save?transferException=true")
+                .delete().to("amq:products.delete?transferException=true")
 
-        from("amq:customers.orderItems.delete")
-                .bean(customerService, "deleteOrderItem")
+        rest("/products/{sku}")
+                .get().to("amq:products.get?transferException=true")
+
+        rest("/products/{sku}/classify")
+                .post().to("amq:products.delete?transferException=true")
+
+        rest("/products/keywords")
+                .post().to("amq:products.delete?transferException=true")
+
+        rest("/products/keywords/{keyword}")
+                .get().to("amq:products.list.keyword?transferException=true")
+
+        rest("admin/reset")
+                .get().to("amq:admin.reset?transferException=true")
     }
 }

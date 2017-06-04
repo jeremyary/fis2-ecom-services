@@ -7,6 +7,7 @@ import com.redhat.refarch.ecom.model.OrderItem
 import com.redhat.refarch.ecom.repository.CustomerRepository
 import com.redhat.refarch.ecom.repository.OrderItemRepository
 import com.redhat.refarch.ecom.repository.OrderRepository
+import org.apache.camel.Consume
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -24,46 +25,64 @@ class CustomerService {
     @Autowired
     OrderItemRepository orderItemRepository
 
-    Customer addCustomer(Customer customer) {
-        return customerRepository.save(customer)
+    @Consume(uri = "amq:customers.get")
+    Customer getCustomer(String customerId) {
+        return customerRepository.getById(customerId)
     }
 
-    Customer getCustomerByUsername(String username) {
-        return customerRepository.getByUsername(username)
-    }
-
-    Customer getCustomer(String id) {
-        return customerRepository.getById(id)
-    }
-
+    @Consume(uri = "amq:customers.save")
     Customer saveCustomer(Customer customer) {
         return customerRepository.save(customer)
     }
 
-    void deleteCustomer(String id) {
-        customerRepository.delete(customerRepository.getById(id))
+    @Consume(uri = "amq:customers.delete")
+    void deleteCustomer(Customer customer) {
+        customerRepository.delete(customer)
+    }
+    
+    @Consume(uri = "amq:customers.authenticate")
+    Customer authenticate(Customer customer) {
+
+        Customer result = getCustomer(customer.getUsername())
+        if (result.getPassword() != customer.getPassword()) {
+            throw new WebApplicationException(HttpURLConnection.HTTP_UNAUTHORIZED)
+        }
+        return result
     }
 
-    static Order addOrder(String customerId, Order order) {
-        return order.setCustomerId(customerId)
-    }
-
-    List<Order> getOrders(String customerId, Status status) {
-        return (status == null) ? orderRepository.findByCustomerId(customerId) : orderRepository.findByStatus(status)
-    }
-
-    Order getOrder(String customerId, String orderId) {
+    @Consume(uri = "amq:customers.orders.get")
+    Order getOrder(String orderId) {
         return orderRepository.getById(orderId)
     }
 
+    @Consume(uri = "amq:customers.orders.list")
+    List<Order> listOrders(String customerId) {
+        return orderRepository.findByCustomerId(customerId)
+    }
+
+    @Consume(uri = "amq:customers.orders.save")
     Order saveOrder(Order order) {
         return orderRepository.save(order)
     }
 
-    void deleteOrder(String orderId) {
-        orderRepository.delete(orderRepository.getById(orderId))
+    @Consume(uri = "amq:customers.orders.delete")
+    void deleteOrder(Order order) {
+        orderRepository.delete(order)
     }
 
+    @Consume(uri = "amq:customers.orders.orderItems.get")
+    OrderItem getOrderItem(String orderItemId) {
+        return orderItemRepository.getById(orderItemId)
+    }
+
+    @Consume(uri = "amq:customers.orders.orderItems.getAll")
+    List<OrderItem> listOrderItems(String orderId) {
+
+        List<String> orderItemIds = getOrder(orderId).getOrderItemIds()
+        return orderItemIds.isEmpty() ? [] : orderItemRepository.findByIdIn(orderItemIds)
+    }
+    
+    @Consume(uri = "amq:customers.orders.orderItems.save")
     OrderItem saveOrderItem(String orderId, OrderItem orderItem) {
 
         OrderItem result = orderItemRepository.save(orderItem)
@@ -73,30 +92,8 @@ class CustomerService {
         return result
     }
 
-    List<OrderItem> getOrderItems(String customerId, String orderId) {
-
-        List<String> orderItemIds = getOrder(customerId, orderId).getOrderItemIds()
-        return orderItemIds.isEmpty() ? [] : orderItemRepository.findByIdIn(orderItemIds)
-    }
-
-    OrderItem getOrderItem(String orderItemId) {
-        return orderItemRepository.getById(orderItemId)
-    }
-
-    OrderItem saveOrderItemById(OrderItem orderItem) {
-        return orderItemRepository.save(orderItem)
-    }
-
-    void deleteOrderItem(String orderItemId) {
-        orderItemRepository.delete(orderItemRepository.getById(orderItemId))
-    }
-
-    Customer authenticate(Customer customer) {
-
-        Customer result = getCustomer(customer.getUsername())
-        if (result.getPassword() != customer.getPassword()) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_UNAUTHORIZED)
-        }
-        return result
+    @Consume(uri = "amq:customers.orders.orderItems.delete")
+    void deleteOrderItem(OrderItem orderItem) {
+        orderItemRepository.delete(orderItem)
     }
 }

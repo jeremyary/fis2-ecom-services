@@ -16,6 +16,7 @@
 package com.redhat.refarch.ecom.service
 
 import com.redhat.refarch.ecom.model.Result
+import org.apache.camel.Consume
 import org.springframework.stereotype.Component
 
 import java.util.logging.Logger
@@ -25,6 +26,7 @@ class WarehouseService {
 
     private Logger logger = Logger.getLogger(getClass().getName())
 
+    @Consume(uri = "amq:warehouse.fulfill")
     void fulfillOrder(Result result) throws Exception {
 
     }

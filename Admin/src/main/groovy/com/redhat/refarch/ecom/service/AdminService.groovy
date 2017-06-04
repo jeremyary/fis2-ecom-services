@@ -20,6 +20,7 @@ import com.redhat.refarch.ecom.repository.CustomerRepository
 import com.redhat.refarch.ecom.repository.OrderItemRepository
 import com.redhat.refarch.ecom.repository.OrderRepository
 import com.redhat.refarch.ecom.repository.ProductRepository
+import org.apache.camel.Consume
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -41,6 +42,7 @@ class AdminService {
     @Autowired
     OrderItemRepository orderItemRepository
 
+    @Consume(uri = "amq:admin.reset")
     void resetData() {
 
         JSONParser parser = new JSONParser()
