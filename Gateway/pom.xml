@@ -20,8 +20,6 @@
         <fabric8.maven.plugin.version>3.1.80.redhat-000010</fabric8.maven.plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
-        <!-- The main class to start by executing java -jar -->
-        <start-class>com.redhat.refarch.ecom.Application</start-class>
     </properties>
 
     <repositories>
@@ -122,6 +120,11 @@
 
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-http4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-spark-rest</artifactId>
         </dependency>
 
@@ -161,6 +164,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>com.redhat.refarch.ecom.Application</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
