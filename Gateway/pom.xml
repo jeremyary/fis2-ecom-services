@@ -64,6 +64,16 @@
     </repositories>
     <pluginRepositories>
         <pluginRepository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
             <id>jboss-enterprise-maven-repository</id>
             <url>https://maven.repository.redhat.com/ga/</url>
             <releases>
