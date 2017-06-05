@@ -20,6 +20,8 @@
         <fabric8.maven.plugin.version>3.1.80.redhat-000010</fabric8.maven.plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <!-- The main class to start by executing java -jar -->
+        <start-class>com.redhat.refarch.ecom.Application</start-class>
     </properties>
 
     <repositories>
