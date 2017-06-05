@@ -12,17 +12,17 @@ class Product {
     String sku
     String name
     String description
-    Integer length
-    Integer width
-    Integer height
-    Integer weight
+    Double length
+    Double width
+    Double height
+    Double weight
     Boolean isFeatured
     Integer availability
     BigDecimal price
     String image
     List<String> keywords = []
 
-    Product(String sku, String name, String description, Integer length, Integer width, Integer height, Integer weight,
+    Product(String sku, String name, String description, Double length, Double width, Double height, Double weight,
             Boolean isFeatured, Integer availability, BigDecimal price, String image, List<String> keywords) {
         this.sku = sku
         this.name = name
@@ -51,10 +51,10 @@ class Product {
         String sku
         String name
         String description
-        Integer length
-        Integer width
-        Integer height
-        Integer weight
+        Double length
+        Double width
+        Double height
+        Double weight
         Boolean isFeatured
         Integer availability
         BigDecimal price
@@ -76,22 +76,22 @@ class Product {
             return this
         }
 
-        ProductBuilder length(Integer length) {
+        ProductBuilder length(Double length) {
             this.length = length
             return this
         }
 
-        ProductBuilder width(Integer width) {
+        ProductBuilder width(Double width) {
             this.width = width
             return this
         }
 
-        ProductBuilder height(Integer height) {
+        ProductBuilder height(Double height) {
             this.height = height
             return this
         }
 
-        ProductBuilder weight(Integer weight) {
+        ProductBuilder weight(Double weight) {
             this.weight = weight
             return this
         }

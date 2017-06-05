@@ -88,5 +88,8 @@ class AppRoute extends SpringRouteBuilder {
 
         rest("admin/reset")
                 .get().to("amq:admin.reset?transferException=true")
+
+        rest("admin/testApi")
+                .get().to("amq:admin.testApi?transferException=true")
     }
 }

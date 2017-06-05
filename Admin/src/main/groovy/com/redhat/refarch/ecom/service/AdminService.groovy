@@ -15,15 +15,25 @@
  */
 package com.redhat.refarch.ecom.service
 
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
+import com.redhat.refarch.ecom.model.Customer
 import com.redhat.refarch.ecom.model.Product
 import com.redhat.refarch.ecom.repository.CustomerRepository
 import com.redhat.refarch.ecom.repository.OrderItemRepository
 import com.redhat.refarch.ecom.repository.OrderRepository
 import com.redhat.refarch.ecom.repository.ProductRepository
 import org.apache.camel.Consume
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
+import org.apache.http.HttpStatus
+import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.utils.URIBuilder
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClients
+import org.junit.Assert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -45,40 +55,70 @@ class AdminService {
     @Consume(uri = "amq:admin.reset")
     void resetData() {
 
-        JSONParser parser = new JSONParser()
         try {
-
             customerRepository.deleteAll()
             productRepository.deleteAll()
             orderRepository.deleteAll()
             orderItemRepository.deleteAll()
 
-            Object input = parser.parse(
-                    new InputStreamReader(AdminService.class.getResourceAsStream("/product_filler.json")))
+            JsonReader jsonReader = new JsonReader(new InputStreamReader(AdminService.class.getResourceAsStream
+                    ("/product_filler.json")))
 
-            List<Product> products = []
-            ((JSONArray) input).each { obj ->
-
-                obj = (JSONObject) obj
-                products.add(new Product.ProductBuilder()
-                        .sku((String) obj.get("sku"))
-                        .name((String) obj.get("name"))
-                        .description((String) obj.get("description"))
-                        .length((Integer) obj.get("length"))
-                        .width((Integer) obj.get("width"))
-                        .height((Integer) obj.get("height"))
-                        .weight((Integer) obj.get("weight"))
-                        .featured((Boolean) obj.get("featured"))
-                        .availability((Integer) obj.get("availability"))
-                        .price((BigDecimal) obj.get("price"))
-                        .image((String) obj.get("image"))
-                        .keywords((JSONArray) obj.get("keywords"))
-                        .build())
-            }
-            productRepository.save(products)
+            productRepository.save(new Gson().fromJson(jsonReader, Product[].class))
 
         } catch (Exception e) {
             e.printStackTrace()
         }
+    }
+
+    @Consume(uri = "amq:admin.testApi")
+    void testApi() {
+
+        resetData()
+
+        Gson gson = new Gson()
+
+        Customer customer = new Customer("Bob Dole", "123 Somewhere St", "1234567890", "bob@dole.com", "bobdole",
+                "password")
+
+        CloseableHttpClient httpClient = HttpClients.createDefault()
+        URIBuilder uriBuilder = getUriBuilder("customers")
+        HttpPost post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        CloseableHttpResponse response = httpClient.execute(post)
+
+        Assert.assertFalse(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST)
+        Customer fetched = customerRepository.getByUsername("bobdole")
+        Assert.assertNotNull(fetched)
+        Assert.assertNotNull(fetched.getId() != null)
+        Assert.assertTrue(fetched.getId().length() > 0)
+
+        uriBuilder = getUriBuilder("customers", fetched.id)
+        HttpGet get = new HttpGet(uriBuilder.build())
+        customer = (Customer) httpClient.execute(get).getEntity()
+        Assert.assertNotNull(customer)
+
+        uriBuilder = getUriBuilder("customers")
+        customer.setAddress("321 Nowhere St")
+        post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        response = httpClient.execute(post)
+
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+    }
+
+    private static URIBuilder getUriBuilder(Object... path) {
+
+        URIBuilder uriBuilder = new URIBuilder()
+                .setScheme("http")
+                .setHost("gateway-service")
+                .setPort(9091)
+
+        StringWriter stringWriter = new StringWriter()
+        path.each {
+            stringWriter.append("/${String.valueOf(it)}")
+        }
+        uriBuilder.setPath(stringWriter.toString())
+        return uriBuilder
     }
 }
