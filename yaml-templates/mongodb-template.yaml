@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: mongodb-template
+objects:
+- apiVersion: v1
+  data:
+    database-admin-password: cGFzc3dvcmQ=
+    database-password: cGFzc3dvcmQ=
+    database-user: bW9uZ291c2Vy
+  kind: Secret
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+    name: mongodb
+  type: Opaque
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: mongodb
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+  spec:
+    replicas: 1
+    selector:
+      name: mongodb
+    template:
+      metadata:
+        labels:
+          name: mongodb
+      spec:
+        containers:
+        - env:
+          - name: MONGODB_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mongodb
+          - name: MONGODB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mongodb
+          - name: MONGODB_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-admin-password
+                name: mongodb
+          - name: MONGODB_DATABASE
+            value: ecom
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          name: mongodb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD --eval="quit()"
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          volumeMounts:
+          - mountPath: /var/lib/mongodb/data
+            name: mongodb-data
+        volumes:
+          - name: mongodb-data
+            emptyDir: {}
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mongodb
+        from:
+          kind: ImageStreamTag
+          name: mongodb:3.2
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+    name: mongodb
+  spec:
+    ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      name: mongodb
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name":"mongodb","namespace":"","kind":"Service"}]'
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+    name: mongo-ingress
+  spec:
+    ports:
+    - nodePort: 30918
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      name: mongodb
+    sessionAffinity: None
+    type: LoadBalancer
