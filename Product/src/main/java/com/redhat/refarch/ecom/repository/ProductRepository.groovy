@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 /***
  * @author jary@redhat.com
  */
-@Repository
 interface ProductRepository extends MongoRepository<Product, String> {
 
     Product getBySku(String sku)
