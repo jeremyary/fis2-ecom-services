@@ -145,6 +145,14 @@
             <artifactId>camel-spring-javaconfig</artifactId>
         </dependency>
 
+
+        <!-- ws.rs -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
         <!-- Mongo -->
         <dependency>
             <groupId>org.springframework.data</groupId>
