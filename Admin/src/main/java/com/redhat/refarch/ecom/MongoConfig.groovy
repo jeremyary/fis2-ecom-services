@@ -46,6 +46,6 @@ class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     String getMappingBasePackage() {
-        return "com.redhat.refarch.ecom"
+        return "com.redhat.refarch.ecom.repository"
     }
 }

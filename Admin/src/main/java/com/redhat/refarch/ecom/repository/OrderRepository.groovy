@@ -2,10 +2,12 @@ package com.redhat.refarch.ecom.repository
 
 import com.redhat.refarch.ecom.model.Order
 import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.stereotype.Repository
 
 /***
  * @author jary@redhat.com
  */
+@Repository
 interface OrderRepository extends MongoRepository<Order, String> {
 
     List<Order> findByCustomerId(String customerId)
