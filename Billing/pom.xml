@@ -36,14 +36,8 @@
     <repositories>
         <!-- explicitly defining central so some build latency is removed on OCP -->
         <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>localrepository</id>
+            <url>file://tmp/artifacts/m2</url>
         </repository>
         <repository>
             <id>jboss-enterprise-maven-repository</id>
@@ -69,14 +63,8 @@
     <pluginRepositories>
         <!-- explicitly defining central so some build latency is removed on OCP -->
         <pluginRepository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>localrepository</id>
+            <url>file://tmp/artifacts/m2</url>
         </pluginRepository>
         <pluginRepository>
             <id>jboss-enterprise-maven-repository</id>
