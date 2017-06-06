@@ -25,6 +25,9 @@ objects:
           kind: ImageStreamTag
           name: fis-java-openshift:2.0
           namespace: openshift
+        env:
+          - name: MAVEN_ARGS_APPEND
+          value: '-B'
       type: Source
     triggers:
     - github:
