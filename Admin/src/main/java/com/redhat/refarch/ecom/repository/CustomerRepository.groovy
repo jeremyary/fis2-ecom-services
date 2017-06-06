@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 /***
  * @author jary@redhat.com
  */
-@Repository
 interface CustomerRepository extends MongoRepository<Customer, String> {
 
     Customer getByUsername(String username)

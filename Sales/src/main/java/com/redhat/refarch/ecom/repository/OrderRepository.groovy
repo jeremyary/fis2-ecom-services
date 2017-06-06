@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 /***
  * @author jary@redhat.com
  */
-@Repository
 interface OrderRepository extends MongoRepository<Order, String> {
 
     List<Order> findByCustomerId(String customerId)

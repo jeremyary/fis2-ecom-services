@@ -151,6 +151,7 @@
             <artifactId>camel-spring-javaconfig</artifactId>
         </dependency>
 
+
         <!-- ws.rs -->
         <dependency>
             <groupId>javax.ws.rs</groupId>

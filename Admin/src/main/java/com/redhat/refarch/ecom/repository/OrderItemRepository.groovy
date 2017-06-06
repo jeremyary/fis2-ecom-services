@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 /***
  * @author jary@redhat.com
  */
-@Repository
 interface OrderItemRepository extends MongoRepository<OrderItem, String> {
 
     List<OrderItem> findByIdIn(List<String> orderItemIds)
