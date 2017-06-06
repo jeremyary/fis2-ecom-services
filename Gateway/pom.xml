@@ -14,6 +14,8 @@
 
         <fabric8.version>2.2.170.redhat-000010</fabric8.version>
         <groovy.version>2.4.11</groovy.version>
+        <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
+        <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
         <java.target.version>1.8</java.target.version>
         <spring-boot.version>1.5.3.RELEASE</spring-boot.version>
         <spring-data.version>1.10.3.RELEASE</spring-data.version>
@@ -26,11 +28,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
+        <!-- abstraction to property value doesn't work -->
         <version>1.5.3.RELEASE</version>
         <relativePath/>
     </parent>
 
     <repositories>
+        <!-- explicitly defining central so some build latency is removed on OCP -->
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2</url>
@@ -63,6 +67,7 @@
         </repository>
     </repositories>
     <pluginRepositories>
+        <!-- explicitly defining central so some build latency is removed on OCP -->
         <pluginRepository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2</url>
@@ -193,12 +198,12 @@
                     <dependency>
                         <groupId>org.codehaus.groovy</groupId>
                         <artifactId>groovy-eclipse-compiler</artifactId>
-                        <version>2.9.2-01</version>
+                        <version>${groovy.eclipse.compiler.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.codehaus.groovy</groupId>
                         <artifactId>groovy-eclipse-batch</artifactId>
-                        <version>2.4.3-01</version>
+                        <version>${groovy.eclipse.batch.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
