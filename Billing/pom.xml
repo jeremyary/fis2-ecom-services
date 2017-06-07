@@ -37,14 +37,14 @@
         <!-- explicitly defining central so some build latency is removed on OCP -->
         <repository>
             <id>localrepository</id>
-            <url>file://tmp/artifacts/m2</url>
+            <url>file:///tmp/artifacts/m2</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <!-- explicitly defining central so some build latency is removed on OCP -->
         <pluginRepository>
             <id>localrepository</id>
-            <url>file://tmp/artifacts/m2</url>
+            <url>file:///tmp/artifacts/m2</url>
         </pluginRepository>
     </pluginRepositories>
 
