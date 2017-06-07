@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.redhat.refarch.microservices</groupId>
-    <artifactId>product-service</artifactId>
+    <artifactId>billing-service</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
@@ -39,52 +39,12 @@
             <id>localrepository</id>
             <url>file://tmp/artifacts/m2</url>
         </repository>
-        <repository>
-            <id>jboss-enterprise-maven-repository</id>
-            <url>https://maven.repository.redhat.com/ga/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>jboss-enterprise-ea-maven-repository</id>
-            <url>https://maven.repository.redhat.com/earlyaccess/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <pluginRepositories>
         <!-- explicitly defining central so some build latency is removed on OCP -->
         <pluginRepository>
             <id>localrepository</id>
             <url>file://tmp/artifacts/m2</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>jboss-enterprise-maven-repository</id>
-            <url>https://maven.repository.redhat.com/ga/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>jboss-enterprise-ea-maven-repository</id>
-            <url>https://maven.repository.redhat.com/earlyaccess/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </pluginRepository>
     </pluginRepositories>
 
