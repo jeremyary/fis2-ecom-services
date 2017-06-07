@@ -23,8 +23,8 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: fis-java-openshift:2.0
-          namespace: openshift
+          name: inject-fis-openshift:latest
+          namespace: ecom-services
         env:
           - name: MAVEN_ARGS_APPEND
             value: '-B'
