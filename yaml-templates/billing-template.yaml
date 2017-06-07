@@ -23,7 +23,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: injected-fis-openshift:latest
+          name: fis2-mvn-injected-openshift:latest
           namespace: ecom-services
         env:
           - name: MAVEN_ARGS_APPEND
