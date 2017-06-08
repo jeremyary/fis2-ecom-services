@@ -30,10 +30,6 @@ class AppRoute extends SpringRouteBuilder {
     @Override
     void configure() throws Exception {
 
-//        from("amq:products.list.featured")
-//                .bean(productService, "findFeatured")
-////                .marshal().json(JsonLibrary.Jackson)
-
         from("amq:products.get")
                 .bean(productService, "getProduct")
                 .marshal().json(JsonLibrary.Jackson)
@@ -44,7 +40,6 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:products.list.featured")
                 .bean(productService, "findFeatured")
-                .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.save")
                 .bean(productService, "saveProduct")
