@@ -64,11 +64,7 @@ class AdminService {
             JsonReader jsonReader = new JsonReader(new InputStreamReader(AdminService.class.getResourceAsStream
                     ("/product_filler.json")))
 
-//            productRepository.save(new Gson().fromJson(jsonReader, Product[].class))
-            Product[] products = new Gson().fromJson(jsonReader, Product[].class)
-            products.each {
-                println it.toString()
-            }
+            productRepository.save(Arrays.asList(new Gson().fromJson(jsonReader, Product[].class)))
 
         } catch (Exception e) {
             e.printStackTrace()
