@@ -15,7 +15,7 @@
  */
 package com.redhat.refarch.ecom
 
-import com.redhat.refarch.ecom.service.ProductService
+import com.redhat.refarch.ecom.service.BillingService
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.spring.SpringRouteBuilder
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,35 +25,17 @@ import org.springframework.stereotype.Component
 class AppRoute extends SpringRouteBuilder {
 
     @Autowired
-    ProductService productService
+    BillingService billingService
 
     @Override
     void configure() throws Exception {
 
-        from("amq:products.get")
-                .bean(productService, "getProduct")
+
+        from("amq:billing.process")
+                .bean(billingService, "process")
                 .marshal().json(JsonLibrary.Jackson)
 
-        from("amq:products.list.keyword")
-                .bean(productService, "getProductsByKeyword")
-                .marshal().json(JsonLibrary.Jackson)
-
-        from("amq:products.list.featured")
-                .bean(productService, "findFeatured")
-                .marshal().json(JsonLibrary.Jackson)
-
-        from("amq:products.save")
-                .bean(productService, "saveProduct")
-                .marshal().json(JsonLibrary.Jackson)
-
-        from("amq:products.delete")
-                .bean(productService, "deleteProduct")
-
-        from("amq:products.reduce")
-                .bean(productService, "reduceInventory")
-                .marshal().json(JsonLibrary.Jackson)
-
-        from("amq:products.keywords.add")
-                .bean(productService, "addKeywordsToProduct")
+        from("amq:billing.refund")
+                .bean(billingService, "refund")
     }
 }

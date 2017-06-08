@@ -18,7 +18,6 @@ package com.redhat.refarch.ecom.service
 import com.redhat.refarch.ecom.model.Result
 import com.redhat.refarch.ecom.model.Result.Status
 import com.redhat.refarch.ecom.model.Transaction
-import org.apache.camel.Consume
 import org.springframework.stereotype.Component
 
 import java.util.logging.Level
@@ -29,7 +28,6 @@ class BillingService {
 
     Logger logger = Logger.getLogger(getClass().getName())
 
-    @Consume(uri = "amq:billing.process")
     static Result process(Transaction transaction) {
 
         Result result = new Result(transaction.getCustomerName(), transaction.getOrderNumber(), transaction.getCustomerId())
@@ -43,7 +41,6 @@ class BillingService {
         return result
     }
 
-    @Consume(uri = "amq:billing.refund")
     void refund(int transactionNumber) {
         logInfo("Asked to refund credit card transaction: " + transactionNumber)
     }

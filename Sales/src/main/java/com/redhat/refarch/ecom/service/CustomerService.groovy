@@ -25,22 +25,18 @@ class CustomerService {
     @Autowired
     OrderItemRepository orderItemRepository
 
-    @Consume(uri = "amq:customers.get")
     Customer getCustomer(String customerId) {
         return customerRepository.getById(customerId)
     }
 
-    @Consume(uri = "amq:customers.save")
     Customer saveCustomer(Customer customer) {
         return customerRepository.save(customer)
     }
 
-    @Consume(uri = "amq:customers.delete")
     void deleteCustomer(Customer customer) {
         customerRepository.delete(customer)
     }
     
-    @Consume(uri = "amq:customers.authenticate")
     Customer authenticate(Customer customer) {
 
         Customer result = getCustomer(customer.getUsername())
@@ -50,39 +46,32 @@ class CustomerService {
         return result
     }
 
-    @Consume(uri = "amq:customers.orders.get")
     Order getOrder(String orderId) {
         return orderRepository.getById(orderId)
     }
 
-    @Consume(uri = "amq:customers.orders.list")
     List<Order> listOrders(String customerId) {
         return orderRepository.findByCustomerId(customerId)
     }
 
-    @Consume(uri = "amq:customers.orders.save")
     Order saveOrder(Order order) {
         return orderRepository.save(order)
     }
 
-    @Consume(uri = "amq:customers.orders.delete")
     void deleteOrder(Order order) {
         orderRepository.delete(order)
     }
 
-    @Consume(uri = "amq:customers.orders.orderItems.get")
     OrderItem getOrderItem(String orderItemId) {
         return orderItemRepository.getById(orderItemId)
     }
 
-    @Consume(uri = "amq:customers.orders.orderItems.getAll")
     List<OrderItem> listOrderItems(String orderId) {
 
         List<String> orderItemIds = getOrder(orderId).getOrderItemIds()
         return orderItemIds.isEmpty() ? [] : orderItemRepository.findByIdIn(orderItemIds)
     }
     
-    @Consume(uri = "amq:customers.orders.orderItems.save")
     OrderItem saveOrderItem(String orderId, OrderItem orderItem) {
 
         OrderItem result = orderItemRepository.save(orderItem)
@@ -92,7 +81,6 @@ class CustomerService {
         return result
     }
 
-    @Consume(uri = "amq:customers.orders.orderItems.delete")
     void deleteOrderItem(OrderItem orderItem) {
         orderItemRepository.delete(orderItem)
     }

@@ -24,7 +24,6 @@ class ProductService {
         return productRepository.findByKeywords(keyword)
     }
 
-//    @Consume(uri = "amq:products.list.featured")
     List<Product> findFeatured() {
         return productRepository.findByIsFeatured(true)
     }
