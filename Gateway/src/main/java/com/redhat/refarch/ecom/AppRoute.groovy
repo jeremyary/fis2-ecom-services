@@ -25,7 +25,7 @@ class AppRoute extends SpringRouteBuilder {
     @Override
     void configure() throws Exception {
 
-        restConfiguration().component("spark-rest").host("0.0.0.0").port(9091)//.bindingMode(RestBindingMode.json)
+        restConfiguration().component("spark-rest").host("0.0.0.0").port(9091)
 
         rest("/billing/process")
                 .post().route()

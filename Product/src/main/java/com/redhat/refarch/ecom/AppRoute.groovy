@@ -32,7 +32,7 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:products.list.featured")
                 .bean(productService, "findFeatured")
-                .marshal().json(JsonLibrary.Jackson)
+//                .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.get")
                 .bean(productService, "getProduct")
