@@ -1,6 +1,7 @@
 package com.redhat.refarch.ecom.admin
 
-import com.redhat.refarch.ecom.admin.service.AdminService
+import com.redhat.refarch.ecom.app.Application
+import com.redhat.refarch.ecom.service.AdminService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
