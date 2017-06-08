@@ -91,3 +91,4 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+/Admin/src/test/java/com/redhat/refarch/ecom.admin/ApiTest.groovy
