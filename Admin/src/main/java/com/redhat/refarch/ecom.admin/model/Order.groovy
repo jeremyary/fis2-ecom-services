@@ -1,6 +1,5 @@
 package com.redhat.refarch.ecom.admin.model
 
-import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
 class Order {

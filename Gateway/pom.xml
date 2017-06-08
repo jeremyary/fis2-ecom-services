@@ -103,6 +103,11 @@
             <artifactId>camel-spark-rest</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jackson</artifactId>
+        </dependency>
+
         <!-- Groovy -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
