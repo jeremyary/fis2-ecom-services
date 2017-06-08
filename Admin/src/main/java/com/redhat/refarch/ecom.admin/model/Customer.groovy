@@ -1,9 +1,7 @@
-package com.redhat.refarch.ecom.model
+package com.redhat.refarch.ecom.admin.model
 
-import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
-@EqualsAndHashCode
 class Customer {
 
     @Id

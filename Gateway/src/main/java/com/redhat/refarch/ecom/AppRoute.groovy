@@ -15,6 +15,7 @@
  */
 package com.redhat.refarch.ecom
 
+import org.apache.camel.model.rest.RestBindingMode
 import org.apache.camel.spring.SpringRouteBuilder
 import org.springframework.stereotype.Component
 
@@ -24,7 +25,7 @@ class AppRoute extends SpringRouteBuilder {
     @Override
     void configure() throws Exception {
 
-        restConfiguration().component("spark-rest").host("0.0.0.0").port(9091)
+        restConfiguration().component("spark-rest").host("0.0.0.0").port(9091).bindingMode(RestBindingMode.json)
 
         rest("/billing/process")
                 .post().route()

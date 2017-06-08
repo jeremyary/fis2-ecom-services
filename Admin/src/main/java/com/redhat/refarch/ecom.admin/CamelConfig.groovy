@@ -13,7 +13,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.redhat.refarch.ecom
+package com.redhat.refarch.ecom.admin
 
 import org.apache.camel.CamelContext
 import org.apache.camel.spring.boot.CamelContextConfiguration
@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration
  * @author jary@redhat.com
  */
 @Configuration
-@ComponentScan("com.redhat.refarch.ecom")
+@ComponentScan("com.redhat.refarch.ecom.admin")
 class CamelConfig extends CamelConfiguration {
 
     @Bean

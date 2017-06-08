@@ -13,16 +13,16 @@
  *  implied.  See the License for the specific language governing
  *  permissions and limitations under the License.
  */
-package com.redhat.refarch.ecom.service
+package com.redhat.refarch.ecom.admin.service
 
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.redhat.refarch.ecom.model.Customer
-import com.redhat.refarch.ecom.model.Product
-import com.redhat.refarch.ecom.repository.CustomerRepository
-import com.redhat.refarch.ecom.repository.OrderItemRepository
-import com.redhat.refarch.ecom.repository.OrderRepository
-import com.redhat.refarch.ecom.repository.ProductRepository
+import com.redhat.refarch.ecom.admin.model.Customer
+import com.redhat.refarch.ecom.admin.model.Product
+import com.redhat.refarch.ecom.admin.repository.CustomerRepository
+import com.redhat.refarch.ecom.admin.repository.OrderItemRepository
+import com.redhat.refarch.ecom.admin.repository.OrderRepository
+import com.redhat.refarch.ecom.admin.repository.ProductRepository
 import org.apache.camel.Consume
 import org.apache.http.HttpStatus
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -111,8 +111,8 @@ class AdminService {
 
         URIBuilder uriBuilder = new URIBuilder()
                 .setScheme("http")
-                .setHost("gateway-service")
-                .setPort(9091)
+                .setHost("ecom.rhmap.ose")
+                .setPort(80)
 
         StringWriter stringWriter = new StringWriter()
         path.each {

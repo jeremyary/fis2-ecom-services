@@ -1,11 +1,9 @@
-package com.redhat.refarch.ecom.model
+package com.redhat.refarch.ecom.admin.model
 
-import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
 import java.math.RoundingMode
 
-@EqualsAndHashCode
 class Product {
 
     @Id
@@ -60,7 +58,7 @@ class Product {
         BigDecimal price
         String image
         List<String> keywords = []
-        
+
         ProductBuilder sku(String sku) {
             this.sku = sku
             return this
@@ -123,7 +121,7 @@ class Product {
 
         Product build() {
             return new Product(sku, name, description, length, width, height, weight, isFeatured, availability, price,
-            image, keywords)
+                    image, keywords)
         }
     }
 }

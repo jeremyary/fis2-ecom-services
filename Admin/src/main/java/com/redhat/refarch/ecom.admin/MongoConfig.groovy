@@ -1,4 +1,4 @@
-package com.redhat.refarch.ecom
+package com.redhat.refarch.ecom.admin
 
 import com.mongodb.Mongo
 import com.mongodb.MongoClient
@@ -19,7 +19,7 @@ class MongoConfig extends AbstractMongoConfiguration {
     @Value('${mongo.port:27017}')
     String  mongoPort
 
-    @Value('${mongo.db:ecom}')
+    @Value('${mongo.db:ecom.admin.admin}')
     String mongoDb
 
     @Value('${mongo.username:mongouser}')
@@ -46,6 +46,6 @@ class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     String getMappingBasePackage() {
-        return "com.redhat.refarch.ecom.repository"
+        return "com.redhat.refarch.ecom.admin.admin.repository"
     }
 }

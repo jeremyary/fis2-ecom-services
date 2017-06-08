@@ -1,9 +1,7 @@
-package com.redhat.refarch.ecom.repository
+package com.redhat.refarch.ecom.admin.repository
 
-import com.redhat.refarch.ecom.model.OrderItem
+import com.redhat.refarch.ecom.admin.model.OrderItem
 import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.mongodb.repository.Query
-import org.springframework.stereotype.Repository
 
 /***
  * @author jary@redhat.com
