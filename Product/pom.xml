@@ -62,6 +62,13 @@
 
     <dependencies>
 
+        <!-- POGO Models -->
+        <dependency>
+            <groupId>com.redhat.refarch.microservices</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!-- Enabling health checks -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

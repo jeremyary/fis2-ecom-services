@@ -13,6 +13,7 @@
         <module>Admin</module>
         <module>Billing</module>
         <module>Gateway</module>
+        <module>Model</module>
         <module>Product</module>
         <module>Sales</module>
         <module>Warehouse</module>

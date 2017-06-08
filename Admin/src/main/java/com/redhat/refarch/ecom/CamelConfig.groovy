@@ -13,7 +13,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.redhat.refarch.ecom.admin
+package com.redhat.refarch.ecom
 
 import org.apache.camel.CamelContext
 import org.apache.camel.spring.boot.CamelContextConfiguration

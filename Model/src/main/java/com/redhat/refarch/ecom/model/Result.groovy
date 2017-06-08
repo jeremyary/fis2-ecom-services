@@ -1,6 +1,9 @@
 package com.redhat.refarch.ecom.model
 
-class Result {
+import groovy.transform.EqualsAndHashCode
+
+@EqualsAndHashCode
+class Result implements Serializable {
 
     static final Random random = new Random()
 

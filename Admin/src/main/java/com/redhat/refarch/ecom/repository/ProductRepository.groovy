@@ -1,6 +1,6 @@
-package com.redhat.refarch.ecom.admin.repository
+package com.redhat.refarch.ecom.repository
 
-import com.redhat.refarch.ecom.admin.model.Product
+import com.redhat.refarch.ecom.model.Product
 import org.springframework.data.mongodb.repository.MongoRepository
 
 /***

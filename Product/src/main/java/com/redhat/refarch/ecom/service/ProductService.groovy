@@ -28,9 +28,7 @@ class ProductService {
 
     @Consume(uri = "amq:products.list.featured")
     List<Product> findFeatured() {
-        List<Product> products = productRepository.findByIsFeatured(true)
-        println (products.toListString())
-        return products
+        return productRepository.findByIsFeatured(true)
     }
 
     @Consume(uri = "amq:products.save")

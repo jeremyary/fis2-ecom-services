@@ -1,4 +1,4 @@
-package com.redhat.refarch.ecom.admin
+package com.redhat.refarch.ecom
 
 import com.mongodb.Mongo
 import com.mongodb.MongoClient

@@ -1,9 +1,12 @@
 package com.redhat.refarch.ecom.model
 
+import groovy.transform.EqualsAndHashCode
+
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
 
-class Error {
+@EqualsAndHashCode
+class Error implements Serializable {
 
     int code
     String message

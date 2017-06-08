@@ -1,8 +1,10 @@
-package com.redhat.refarch.ecom.admin.model
+package com.redhat.refarch.ecom.model
 
+import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
-class OrderItem {
+@EqualsAndHashCode
+class OrderItem implements Serializable {
 
     @Id
     String id

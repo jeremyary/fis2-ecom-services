@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id
 import java.math.RoundingMode
 
 @EqualsAndHashCode
-class Product {
+class Product implements Serializable {
 
     @Id
     String sku
@@ -60,7 +60,7 @@ class Product {
         BigDecimal price
         String image
         List<String> keywords = []
-        
+
         ProductBuilder sku(String sku) {
             this.sku = sku
             return this
@@ -123,7 +123,7 @@ class Product {
 
         Product build() {
             return new Product(sku, name, description, length, width, height, weight, isFeatured, availability, price,
-            image, keywords)
+                    image, keywords)
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.redhat.refarch.ecom.model
 
-class Inventory {
+import groovy.transform.EqualsAndHashCode
+
+@EqualsAndHashCode
+class Inventory implements Serializable {
     String sku
     int quantity
 
