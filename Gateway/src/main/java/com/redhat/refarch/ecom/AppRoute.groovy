@@ -29,7 +29,7 @@ class AppRoute extends SpringRouteBuilder {
 
         rest("/billing/process")
                 .post().route()
-                .to("amq:billing.process?transferException=true&jmsMessageType=Text")
+                .to("amq:billing.process?transferException=true")
                 .wireTap("direct:warehouse")
 
         from("direct:warehouse")
@@ -38,59 +38,59 @@ class AppRoute extends SpringRouteBuilder {
                 .inOnly("amq:topic:warehouse.fulfill")
 
         rest("/billing/refund/{transactionNumber}")
-                .post().to("amq:billing.refund?transferException=true&jmsMessageType=Text")
+                .post().to("amq:billing.refund?transferException=true")
 
         rest("/customers")
-                .put().to("amq:customers.save?transferException=true&jmsMessageType=Text")
-                .patch().to("amq:customers.save?transferException=true&jmsMessageType=Text")
-                .delete().to("amq:customers.delete?transferException=true&jmsMessageType=Text")
+                .put().to("amq:customers.save?transferException=true")
+                .patch().to("amq:customers.save?transferException=true")
+                .delete().to("amq:customers.delete?transferException=true")
 
         rest("/customers/authenticate")
-                .post().to("amq:customers.authenticate?transferException=true&jmsMessageType=Text")
+                .post().to("amq:customers.authenticate?transferException=true")
 
         rest("/customers/{customerId}")
-                .get().to("amq:customers.get?transferException=true&jmsMessageType=Text")
+                .get().to("amq:customers.get?transferException=true")
 
         rest("/customers/{customerId}/orders")
-                .get().to("amq:customers.orders.list?transferException=true&jmsMessageType=Text")
-                .put().to("amq:customers.orders.save?transferException=true&jmsMessageType=Text")
-                .patch().to("amq:customers.orders.save?transferException=true&jmsMessageType=Text")
-                .delete().to("amq:customers.orders.delete?transferException=true&jmsMessageType=Text")
+                .get().to("amq:customers.orders.list?transferException=true")
+                .put().to("amq:customers.orders.save?transferException=true")
+                .patch().to("amq:customers.orders.save?transferException=true")
+                .delete().to("amq:customers.orders.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}")
-                .get().to("amq:customers.orders.get?transferException=true&jmsMessageType=Text")
+                .get().to("amq:customers.orders.get?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems")
-                .get().to("amq:customers.orders.orderItems.list?transferException=true&jmsMessageType=Text")
-                .put().to("amq:customers.orders.orderItems.save?transferException=true&jmsMessageType=Text")
-                .patch().to("amq:customers.orders.orderItems.save?transferException=true&jmsMessageType=Text")
-                .delete().to("amq:customers.orders.orderItems.delete?transferException=true&jmsMessageType=Text")
+                .get().to("amq:customers.orders.orderItems.list?transferException=true")
+                .put().to("amq:customers.orders.orderItems.save?transferException=true")
+                .patch().to("amq:customers.orders.orderItems.save?transferException=true")
+                .delete().to("amq:customers.orders.orderItems.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems/{orderItemId}")
-                .get().to("amq:customers.orders.orderItems.get?transferException=true&jmsMessageType=Text")
+                .get().to("amq:customers.orders.orderItems.get?transferException=true")
 
         rest("/products")
-                .get().to("amq:products.list.featured?transferException=true&jmsMessageType=Text")
-                .put().to("amq:products.save?transferException=true&jmsMessageType=Text")
-                .patch().to("amq:products.save?transferException=true&jmsMessageType=Text")
-                .delete().to("amq:products.delete?transferException=true&jmsMessageType=Text")
+                .get().to("amq:products.list.featured?transferException=true")
+                .put().to("amq:products.save?transferException=true")
+                .patch().to("amq:products.save?transferException=true")
+                .delete().to("amq:products.delete?transferException=true")
 
         rest("/products/{sku}")
-                .get().to("amq:products.get?transferException=true&jmsMessageType=Text")
+                .get().to("amq:products.get?transferException=true")
 
         rest("/products/{sku}/classify")
-                .post().to("amq:products.delete?transferException=true&jmsMessageType=Text")
+                .post().to("amq:products.delete?transferException=true")
 
         rest("/products/keywords")
-                .post().to("amq:products.delete?transferException=true&jmsMessageType=Text")
+                .post().to("amq:products.delete?transferException=true")
 
         rest("/products/keywords/{keyword}")
-                .get().to("amq:products.list.keyword?transferException=true&jmsMessageType=Text")
+                .get().to("amq:products.list.keyword?transferException=true")
 
         rest("admin/reset")
-                .get().to("amq:admin.reset?transferException=true&jmsMessageType=Text")
+                .get().to("amq:admin.reset?transferException=true")
 
         rest("admin/testApi")
-                .get().to("amq:admin.testApi?transferException=true&jmsMessageType=Text")
+                .get().to("amq:admin.testApi?transferException=true")
     }
 }

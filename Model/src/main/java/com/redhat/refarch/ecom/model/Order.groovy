@@ -1,10 +1,8 @@
 package com.redhat.refarch.ecom.model
 
-import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
-@EqualsAndHashCode
-class Order implements Serializable {
+class Order {
     enum Status
     {
         Initial, InProgress, Canceled, Paid, Shipped, Completed

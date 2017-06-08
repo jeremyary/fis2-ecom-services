@@ -1,12 +1,10 @@
 package com.redhat.refarch.ecom.model
 
-import groovy.transform.EqualsAndHashCode
 import org.springframework.data.annotation.Id
 
 import java.math.RoundingMode
 
-@EqualsAndHashCode
-class Product implements Serializable {
+class Product {
 
     @Id
     String sku

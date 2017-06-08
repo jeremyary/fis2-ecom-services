@@ -1,9 +1,6 @@
 package com.redhat.refarch.ecom.model
 
-import groovy.transform.EqualsAndHashCode
-
-@EqualsAndHashCode
-class Transaction implements Serializable {
+class Transaction {
 
     Long creditCardNumber
     Integer expMonth
