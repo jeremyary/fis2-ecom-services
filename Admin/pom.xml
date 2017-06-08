@@ -209,6 +209,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/*KT.java</exclude>
+                        <exclude>**/ApiTest.groovy</exclude>
                     </excludes>
                 </configuration>
             </plugin>
