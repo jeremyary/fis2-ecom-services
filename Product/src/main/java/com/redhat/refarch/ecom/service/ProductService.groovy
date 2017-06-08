@@ -16,12 +16,10 @@ class ProductService {
     @Autowired
     ProductRepository productRepository
 
-    @Consume(uri = "amq:products.get")
     Product getProduct(String sku) {
         return productRepository.getBySku(sku)
     }
 
-    @Consume(uri = "amq:products.list.keyword")
     List<Product> getProductsByKeyword(String keyword) {
         return productRepository.findByKeywords(keyword)
     }
@@ -30,17 +28,14 @@ class ProductService {
         return productRepository.findByIsFeatured(true)
     }
 
-    @Consume(uri = "amq:products.save")
     Product saveProduct(Product product) {
         return productRepository.save(product)
     }
 
-    @Consume(uri = "amq:products.delete")
     void deleteProduct(String sku) {
         productRepository.delete(productRepository.getBySku(sku))
     }
 
-    @Consume(uri = "amq:products.reduce")
     Response reduceInventory(Inventory[] inventoryAdjustment) {
         try {
             for (Inventory inventory : inventoryAdjustment) {
@@ -64,7 +59,6 @@ class ProductService {
         return Response.ok().build()
     }
 
-    @Consume(uri = "amq:products.keywords.add")
     void addKeywordsToProduct(String sku, List<String> keywords) {
 
         Product product = getProduct(sku)
