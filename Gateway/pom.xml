@@ -117,14 +117,28 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jersey</artifactId>
+            <artifactId>camel-cdi</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jackson</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.12</version>
+        </dependency>
+
 
         <!-- Groovy -->
         <dependency>
