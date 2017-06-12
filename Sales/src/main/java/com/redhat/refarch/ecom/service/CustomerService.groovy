@@ -26,7 +26,8 @@ class CustomerService {
     OrderItemRepository orderItemRepository
 
     Customer getCustomer(String customerId) {
-        return customerRepository.getById(customerId)
+        Customer cust = customerRepository.getById(customerId)
+        println "RETURNING CUSTOMER: ${cust.toString()}"
     }
 
     Customer saveCustomer(Customer customer) {

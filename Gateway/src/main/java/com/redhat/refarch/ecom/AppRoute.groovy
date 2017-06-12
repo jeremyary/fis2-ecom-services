@@ -91,7 +91,7 @@ class AppRoute extends SpringRouteBuilder {
                     .to("amq:customers.authenticate?transferException=true")
 
         rest("/customers/{customerId}").description("individual customer endpoint")
-//                .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
+                .consumes(MediaType.TEXT_PLAIN).produces(MediaType.APPLICATION_JSON)
                 .get()
                     .description("get customer").outType(Customer.class)
                     .param().name("customerId").type(RestParamType.path)
