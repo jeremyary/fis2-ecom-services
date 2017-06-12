@@ -34,7 +34,7 @@ class AppRoute extends SpringRouteBuilder {
     void configure() throws Exception {
 
         from("amq:customers.get")
-                .bean(customerService, 'getCustomer(${header.customerId}')
+                .bean(customerService, 'getCustomer(${header.customerId})')
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:customers.save")
