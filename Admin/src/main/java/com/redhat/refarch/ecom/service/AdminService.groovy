@@ -99,11 +99,11 @@ class AdminService {
         customer = (Customer) httpClient.execute(get).getEntity()
         Assert.assertNotNull(customer)
 
-        uriBuilder = getUriBuilder("customers")
-        customer.setAddress("321 Nowhere St")
-        post = new HttpPost(uriBuilder.build())
-        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-        response = httpClient.execute(post)
+//        uriBuilder = getUriBuilder("customers")
+//        customer.setAddress("321 Nowhere St")
+//        post = new HttpPost(uriBuilder.build())
+//        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+//        response = httpClient.execute(post)
 
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
     }
