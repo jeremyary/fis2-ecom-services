@@ -35,12 +35,14 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.get")
                 .bean(customerService, 'getCustomer(${header.customerId})')
+                .to("log:customers.get?level=DEBUG")
                 .marshal().json(JsonLibrary.Jackson)
+                .to("log:customers.get?level=DEBUG")
 
         from("amq:customers.save")
                 .unmarshal().json(JsonLibrary.Jackson, Customer.class)
                 .bean(customerService, "saveCustomer")
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, Customer.class)
 
         from("amq:customers.delete")
                 .unmarshal().json(JsonLibrary.Jackson, Customer.class)
@@ -49,11 +51,11 @@ class AppRoute extends SpringRouteBuilder {
         from("amq:customers.authenticate")
                 .unmarshal().json(JsonLibrary.Jackson, Customer.class)
                 .bean(customerService, "authenticate")
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, Customer.class)
 
         from("amq:customers.orders.get")
                 .bean(customerService, 'getOrder(${header.orderId})')
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, Order.class)
 
         from("amq:customers.orders.list")
                 .bean(customerService, 'listOrders(${header.customerId})')
@@ -62,7 +64,7 @@ class AppRoute extends SpringRouteBuilder {
         from("amq:customers.orders.save")
                 .unmarshal().json(JsonLibrary.Jackson, Order.class)
                 .bean(customerService, "saveOrder")
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, Order.class)
 
         from("amq:customers.orders.delete")
                 .unmarshal().json(JsonLibrary.Jackson, Order.class)
@@ -70,7 +72,7 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.orders.orderItems.get")
                 .bean(customerService, 'getOrderItem(${header.orderItemId})')
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, OrderItem.class)
 
         from("amq:customers.orders.orderItems.getAll")
                 .bean(customerService, 'listOrderItems(${header.orderId})')
@@ -78,7 +80,7 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.orders.orderItems.save")
                 .bean(customerService, 'saveOrderItem(${header.orderId}, ${body})')
-                .marshal().json(JsonLibrary.Jackson)
+                .marshal().json(JsonLibrary.Jackson, OrderItem.class)
 
         from("amq:customers.orders.orderItems.delete")
                 .unmarshal().json(JsonLibrary.Jackson, OrderItem.class)
