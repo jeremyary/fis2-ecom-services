@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>com.redhat.refarch.ecom.app.Application</start-class>
+        <start-class>com.redhat.refarch.ecom.Application</start-class>
 
         <fabric8.version>2.2.170.redhat-000010</fabric8.version>
         <groovy.version>2.4.11</groovy.version>

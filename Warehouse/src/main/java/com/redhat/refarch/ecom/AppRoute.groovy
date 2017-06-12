@@ -15,7 +15,9 @@
  */
 package com.redhat.refarch.ecom
 
+import com.redhat.refarch.ecom.model.Result
 import com.redhat.refarch.ecom.service.WarehouseService
+import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.spring.SpringRouteBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -30,6 +32,7 @@ class AppRoute extends SpringRouteBuilder {
     void configure() throws Exception {
 
         from("amq:warehouse.fulfill")
+                .unmarshal().json(JsonLibrary.Jackson, Result.class)
                 .bean(warehouseService, "fulfillOrder")
     }
 }

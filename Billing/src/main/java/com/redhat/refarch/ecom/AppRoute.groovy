@@ -15,6 +15,7 @@
  */
 package com.redhat.refarch.ecom
 
+import com.redhat.refarch.ecom.model.Transaction
 import com.redhat.refarch.ecom.service.BillingService
 import org.apache.camel.model.dataformat.JsonLibrary
 import org.apache.camel.spring.SpringRouteBuilder
@@ -30,8 +31,8 @@ class AppRoute extends SpringRouteBuilder {
     @Override
     void configure() throws Exception {
 
-
         from("amq:billing.process")
+                .unmarshal().json(JsonLibrary.Jackson, Transaction.class)
                 .bean(billingService, "process")
                 .marshal().json(JsonLibrary.Jackson)
 

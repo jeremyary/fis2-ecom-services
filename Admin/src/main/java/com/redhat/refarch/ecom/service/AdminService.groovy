@@ -28,6 +28,7 @@ import org.apache.http.HttpStatus
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
@@ -83,9 +84,9 @@ class AdminService {
 
         CloseableHttpClient httpClient = HttpClients.createDefault()
         URIBuilder uriBuilder = getUriBuilder("customers")
-        HttpPost post = new HttpPost(uriBuilder.build())
-        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-        CloseableHttpResponse response = httpClient.execute(post)
+        HttpPut put= new HttpPut(uriBuilder.build())
+        put.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        CloseableHttpResponse response = httpClient.execute(put)
 
         Assert.assertFalse(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST)
         Customer fetched = customerRepository.getByUsername("bobdole")
@@ -112,7 +113,6 @@ class AdminService {
         URIBuilder uriBuilder = new URIBuilder()
                 .setScheme("http")
                 .setHost("ecom.rhmap.ose")
-                .setPort(80)
 
         StringWriter stringWriter = new StringWriter()
         path.each {
