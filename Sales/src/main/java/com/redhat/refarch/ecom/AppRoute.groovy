@@ -35,9 +35,6 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.get")
                 .bean(customerService, 'getCustomer(${header.customerId})')
-                .to("log:customers.get?level=DEBUG")
-                .marshal().json(JsonLibrary.Jackson)
-                .to("log:customers.get?level=DEBUG")
 
         from("amq:customers.save")
                 .unmarshal().json(JsonLibrary.Jackson, Customer.class)
