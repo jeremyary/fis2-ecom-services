@@ -33,11 +33,11 @@ class AppRoute extends SpringRouteBuilder {
     void configure() throws Exception {
 
         from("amq:products.get")
-                .bean(productService, "getProduct")
+                .bean(productService, 'getProduct(${header.sku})')
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.list.keyword")
-                .bean(productService, "getProductsByKeyword")
+                .bean(productService, 'getProductsByKeyword(${header.keyword})')
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.list.featured")
@@ -50,7 +50,7 @@ class AppRoute extends SpringRouteBuilder {
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.delete")
-                .bean(productService, "deleteProduct")
+                .bean(productService, 'deleteProduct(${header.sku})')
 
         from("amq:products.reduce")
                 .unmarshal().json(JsonLibrary.Jackson, Inventory[].class)
@@ -58,6 +58,6 @@ class AppRoute extends SpringRouteBuilder {
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:products.keywords.add")
-                .bean(productService, "addKeywordsToProduct")
+                .bean(productService, 'addKeywordsToProduct(${header.sku}, ${body})')
     }
 }

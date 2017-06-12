@@ -27,6 +27,7 @@ import org.apache.camel.Consume
 import org.apache.http.HttpStatus
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.apache.http.client.utils.URIBuilder
@@ -82,30 +83,71 @@ class AdminService {
         Customer customer = new Customer("Bob Dole", "123 Somewhere St", "1234567890", "bob@dole.com", "bobdole",
                 "password")
 
+        // save new customer
         CloseableHttpClient httpClient = HttpClients.createDefault()
         URIBuilder uriBuilder = getUriBuilder("customers")
-        HttpPut put= new HttpPut(uriBuilder.build())
+        HttpPut put = new HttpPut(uriBuilder.build())
         put.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
         CloseableHttpResponse response = httpClient.execute(put)
-
         Assert.assertFalse(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST)
-        Customer fetched = customerRepository.getByUsername("bobdole")
-        Assert.assertNotNull(fetched)
-        Assert.assertNotNull(fetched.getId() != null)
-        Assert.assertTrue(fetched.getId().length() > 0)
+        Customer fetchedCustomer = customerRepository.getByUsername("bobdole")
+        Assert.assertNotNull(fetchedCustomer)
+        Assert.assertNotNull(fetchedCustomer.getId() != null)
+        Assert.assertTrue(fetchedCustomer.getId().length() > 0)
 
-        uriBuilder = getUriBuilder("customers", fetched.id)
+        // get customer
+        uriBuilder = getUriBuilder("customers", fetchedCustomer.id)
         HttpGet get = new HttpGet(uriBuilder.build())
         customer = (Customer) httpClient.execute(get).getEntity()
-        Assert.assertNotNull(customer)
-
-//        uriBuilder = getUriBuilder("customers")
-//        customer.setAddress("321 Nowhere St")
-//        post = new HttpPost(uriBuilder.build())
-//        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-//        response = httpClient.execute(post)
-
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertNotNull(customer)
+        Assert.assertEquals(customer, fetchedCustomer)
+
+        // authenticate customer
+        uriBuilder = getUriBuilder("customers", "authenticate")
+        HttpPost post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        customer = (Customer) httpClient.execute(post).getEntity()
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertNotNull(customer)
+        Assert.assertEquals(customer, fetchedCustomer)
+
+        // delete customer
+        uriBuilder = getUriBuilder("customers", "delete")
+        post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        httpClient.execute(post)
+        Assert.assertNull(customerRepository.getByUsername("bobdole"))
+
+        // patch customer
+        uriBuilder = getUriBuilder("customers")
+        HttpPatch patch = new HttpPatch(uriBuilder.build())
+        patch.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
+        customer = (Customer) httpClient.execute(patch).getEntity()
+        fetchedCustomer = customerRepository.getByUsername("bobdole")
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertNotNull(customer)
+        Assert.assertEquals(customer, fetchedCustomer)
+
+        // list featured products
+        uriBuilder = getUriBuilder("products")
+        get = new HttpGet(uriBuilder.build())
+        List<Product> products = (List<Product>) httpClient.execute(get).getEntity()
+        List<Product> fetchedProducts = productRepository.findByIsFeatured(true)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertNotNull(products)
+        Assert.assertTrue(products.size() > 0)
+        Assert.assertEquals(products, fetchedProducts)
+
+        // list products by keyword
+        uriBuilder = getUriBuilder("products", "keywords", "Electronics")
+        get = new HttpGet(uriBuilder.build())
+        products = (List<Product>) httpClient.execute(get).getEntity()
+        fetchedProducts = productRepository.findByKeywords("Electronics")
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertNotNull(products)
+        Assert.assertTrue(products.size() > 0)
+        Assert.assertEquals(products, fetchedProducts)
     }
 
     private static URIBuilder getUriBuilder(Object... path) {
