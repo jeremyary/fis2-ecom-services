@@ -20,6 +20,8 @@ class Product {
     String image
     List<String> keywords = []
 
+    Product() {}
+
     Product(String sku, String name, String description, Double length, Double width, Double height, Double weight,
             Boolean isFeatured, Integer availability, BigDecimal price, String image, List<String> keywords) {
         this.sku = sku

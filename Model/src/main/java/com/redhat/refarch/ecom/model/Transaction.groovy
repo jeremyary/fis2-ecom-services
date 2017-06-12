@@ -12,6 +12,8 @@ class Transaction {
     Long orderNumber
     Double amount
 
+    Transaction() {}
+
     Transaction(Long creditCardNumber, Integer expMonth, Integer expYear, Integer verificationCode,
                 String billingAddress, Long customerId, String customerName, Long orderNumber, Double amount) {
         this.creditCardNumber = creditCardNumber

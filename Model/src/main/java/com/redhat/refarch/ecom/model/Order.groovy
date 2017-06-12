@@ -16,6 +16,8 @@ class Order {
     String customerId
     List<String> orderItemIds = []
 
+    Order() {}
+
     Order(Long id, Status status, Long transactionNumber, Date transactionDate, String customerId, List<String>
             orderItemIds) {
         this.id = id

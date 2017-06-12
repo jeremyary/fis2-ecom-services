@@ -9,6 +9,8 @@ class OrderItem {
     Long sku
     Integer quantity
 
+    OrderItem() {}
+
     OrderItem(Long id, Long sku, Integer quantity) {
         this.id = id
         this.sku = sku

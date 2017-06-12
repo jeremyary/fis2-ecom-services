@@ -13,6 +13,8 @@ class Customer {
     String username
     String password
 
+    Customer() {}
+
     Customer(String id, String name, String address, String telephone, String email, String username, String password) {
         this.id = id
         this.name = name

@@ -15,6 +15,8 @@ class Result {
     Date transactionDate
     Integer transactionNumber
 
+    Result() {}
+
     Result(String name, Long customerId, Long orderNumber) {
         this.name = name
         this.customerId = customerId
