@@ -92,8 +92,6 @@ class AdminService {
         Assert.assertFalse(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST)
         Customer fetchedCustomer = customerRepository.getByUsername("bobdole")
         Assert.assertNotNull(fetchedCustomer)
-        Assert.assertNotNull(fetchedCustomer.getId() != null)
-        Assert.assertTrue(fetchedCustomer.getId().length() > 0)
 
         // get customer
         uriBuilder = getUriBuilder("customers", fetchedCustomer.id)
