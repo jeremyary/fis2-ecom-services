@@ -9,6 +9,4 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface CustomerRepository extends MongoRepository<Customer, String> {
 
     Customer getByUsername(String username)
-
-    Customer getById(String id)
 }

@@ -26,7 +26,7 @@ class CustomerService {
     OrderItemRepository orderItemRepository
 
     Customer getCustomer(String customerId) {
-        Customer cust = customerRepository.getById(customerId)
+        Customer cust = customerRepository.findOne(customerId)
         println "RETURNING CUSTOMER: ${cust.toString()}"
     }
 
