@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: Template
+labels: {}
+metadata:
+  annotations:
+    description: Template to inject mvn dependencies into java-fis-openshift:2.0 image
+  labels:
+    app: fis2-mvn-injected-openshift
+  name: fis2-mvn-injected-openshift
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations: {}
+    labels:
+      app: fis2-mvn-injected-openshift
+      group: build
+      project: fis2-mvn-injected-openshift
+      version: 1.0.0
+    name: fis2-mvn-injected-openshift
+  spec:
+    dockerImageRepository: "${REGISTRY}:5000/${IS_PULL_NAMESPACE}/fis2-mvn-injected-openshift"
+    tags:
+    - annotations:
+        tags: "${IS_TAG}"
+      from:
+        kind: ImageStreamTag
+        name: fis2-mvn-injected-openshift
+      name: "${IS_TAG}"
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations: {}
+    labels:
+      app: fis2-mvn-injected-openshift
+      group: build
+      project: fis2-mvn-injected-openshift
+      version: 1.0.0
+    name: fis2-mvn-injected-openshift
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: fis2-mvn-injected-openshift:${IS_TAG}
+    source:
+      git:
+        uri: https://github.com/jeremyary/fis2-mvn-injected-template.git
+      images: []
+      secrets: []
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+        from:
+          kind: ImageStreamTag
+          name: fis-java-openshift:2.0
+          namespace: openshift
+        env:
+          - name: "PROJECT_REPO"
+            value: "${GIT_URL}"
+        incremental: false
+      type: Docker
+    triggers:
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: fis-java-openshift:2.0
+          namespace: openshift
+      type: ImageChange
+parameters:
+- name: IS_TAG
+  value: latest
+- name: REGISTRY
+  value: 172.30.37.138
+- name: IS_PULL_NAMESPACE
+  value: openshift
+- name: GIT_URL
+  value: https://github.com/jeremyary/fis2-ecom-services.git
