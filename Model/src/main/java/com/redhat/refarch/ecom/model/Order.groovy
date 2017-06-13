@@ -17,6 +17,4 @@ class Order {
     Date transactionDate
     String customerId
     List<String> orderItemIds = []
-
-    Order() {}
 }

@@ -14,6 +14,4 @@ class Transaction {
     String customerName
     Long orderNumber
     Double amount
-
-    Transaction() {}
 }

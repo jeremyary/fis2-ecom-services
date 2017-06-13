@@ -55,6 +55,11 @@ class CustomerService {
         return orderRepository.findByCustomerId(customerId)
     }
 
+    Order getInitialOrder(String customerId) {
+        List<Order> orders = orderRepository.findByCustomerId(customerId)
+        return orders.find { it.status == Status.Initial }
+    }
+
     Order saveOrder(Order order) {
         return orderRepository.save(order)
     }

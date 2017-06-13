@@ -17,6 +17,4 @@ class Result {
     Long orderNumber
     Date transactionDate
     Integer transactionNumber
-
-    Result() {}
 }

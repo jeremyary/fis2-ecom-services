@@ -10,6 +10,4 @@ class OrderItem {
     String id
     String sku
     Integer quantity
-
-    OrderItem() {}
 }

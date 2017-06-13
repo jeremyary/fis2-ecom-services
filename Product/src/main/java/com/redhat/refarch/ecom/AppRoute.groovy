@@ -15,7 +15,6 @@
  */
 package com.redhat.refarch.ecom
 
-import com.redhat.refarch.ecom.model.Inventory
 import com.redhat.refarch.ecom.model.Product
 import com.redhat.refarch.ecom.service.ProductService
 import org.apache.camel.model.dataformat.JsonLibrary
@@ -53,11 +52,11 @@ class AppRoute extends SpringRouteBuilder {
                 .bean(productService, 'deleteProduct(${header.sku})')
 
         from("amq:products.reduce")
-                .unmarshal().json(JsonLibrary.Jackson, Inventory[].class)
-                .bean(productService, "reduceInventory")
-                .marshal().json(JsonLibrary.Jackson)
+                .bean(productService, 'reduceInventory(${header.sku}, ${header.quantity})')
 
         from("amq:products.keywords.add")
+                .unmarshal().json(JsonLibrary.Jackson, String[].class)
                 .bean(productService, 'addKeywordsToProduct(${header.sku}, ${body})')
+                .marshal().json(JsonLibrary.Jackson)
     }
 }
