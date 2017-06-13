@@ -28,9 +28,14 @@ class BillingService {
 
     Logger logger = Logger.getLogger(getClass().getName())
 
+    static final Random random = new Random()
+
     static Result process(Transaction transaction) {
 
-        Result result = new Result(transaction.getCustomerName(), transaction.getOrderNumber(), transaction.getCustomerId())
+        Result result = new Result()
+        result.name = transaction.getCustomerName()
+        result.orderNumber = transaction.getOrderNumber()
+        result.customerId = transaction.getCustomerId()
 
         Calendar now = Calendar.getInstance()
         Calendar calendar = Calendar.getInstance()
@@ -38,6 +43,8 @@ class BillingService {
         calendar.set(transaction.getExpYear(), transaction.getExpMonth(), 1)
 
         result.setStatus(calendar.after(now) ? Status.SUCCESS : Status.FAILURE)
+        result.transactionNumber = random.nextInt(9000000) + 1000000
+        result.transactionDate = Calendar.getInstance().getTime()
         return result
     }
 

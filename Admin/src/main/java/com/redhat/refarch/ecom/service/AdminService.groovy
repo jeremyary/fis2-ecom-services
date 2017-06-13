@@ -21,6 +21,8 @@ import com.redhat.refarch.ecom.model.Customer
 import com.redhat.refarch.ecom.model.Order
 import com.redhat.refarch.ecom.model.OrderItem
 import com.redhat.refarch.ecom.model.Product
+import com.redhat.refarch.ecom.model.Result
+import com.redhat.refarch.ecom.model.Transaction
 import com.redhat.refarch.ecom.repository.CustomerRepository
 import com.redhat.refarch.ecom.repository.OrderItemRepository
 import com.redhat.refarch.ecom.repository.OrderRepository
@@ -261,6 +263,21 @@ class AdminService {
         response = doDelete()
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(orderItemRepository.findOne(orderItem.id))
+
+        //test process
+        Transaction transaction = new Transaction()
+        transaction.customerId = customer.id
+        transaction.orderNumber = order.id
+        transaction.amount = 100.99
+        transaction.creditCardNumber = 123457890123456
+        transaction.expYear = 2030
+        transaction.expMonth = 1
+        uri("billing", "process")
+        Result result = (Result) doPost(transaction, Result.class)
+        Assert.assertEquals(result.status, Result.Status.SUCCESS)
+        transaction.setExpYear(2010)
+        result = (Result) doPost(transaction, Result.class)
+        Assert.assertEquals(result.status, Result.Status.FAILURE)
     }
 
     private Object doPut(Object objToMarshal, Class clazz) {

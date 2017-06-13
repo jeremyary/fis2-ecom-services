@@ -5,16 +5,14 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode
 class Result {
 
-    static final Random random = new Random()
-
     enum Status {
         SUCCESS, FAILURE
     }
 
     Status status
     String name
-    Long customerId
-    Long orderNumber
+    String customerId
+    String orderNumber
     Date transactionDate
     Integer transactionNumber
 }

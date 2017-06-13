@@ -46,6 +46,8 @@ class AppRoute extends SpringRouteBuilder {
                     .description("process transaction").outType(Result.class)
                     .param().name("transaction").type(RestParamType.body)
                     .description("transaction to be processed").endParam()
+                    .responseMessage().code(200).message("billing complete, forking to fulfillment")
+                .endResponseMessage()
                     .route()
                     .to("amq:billing.process?transferException=true")
                 .wireTap("direct:warehouse")
@@ -61,6 +63,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("process refund")
                     .param().name("transactionNumber").type(RestParamType.path)
                     .description("transactionNumber to be refunded").endParam()
+                    .responseMessage().code(200).message("billing refund complete").endResponseMessage()
                     .to("amq:billing.refund?transferException=true")
 
         rest("/customers").description("customers endpoint")
@@ -69,12 +72,14 @@ class AppRoute extends SpringRouteBuilder {
                     .description("save new customer").outType(Customer.class)
                     .param().name("customer").type(RestParamType.body)
                     .description("customer to save").endParam()
+                    .responseMessage().code(200).message("new customer saved").endResponseMessage()
                     .to("amq:customers.save?transferException=true")
 
                 .patch()
                     .description("update customer").outType(Customer.class)
                     .param().name("customer").type(RestParamType.body)
                     .description("customer to update").endParam()
+                    .responseMessage().code(200).message("customer updated").endResponseMessage()
                     .to("amq:customers.save?transferException=true")
 
         rest("/customers/authenticate").description("customer authentication endpoint")
@@ -83,6 +88,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("authenticate customer").outType(Customer.class)
                     .param().name("customer").type(RestParamType.body)
                     .description("customer to authenticate").endParam()
+                    .responseMessage().code(200).message("customer authenticated").endResponseMessage()
                     .to("amq:customers.authenticate?transferException=true")
 
         rest("/customers/{customerId}").description("individual customer endpoint")
@@ -91,12 +97,14 @@ class AppRoute extends SpringRouteBuilder {
                     .description("get customer").outType(Customer.class)
                     .param().name("customerId").type(RestParamType.path)
                     .description("id of customer to fetch").endParam()
+                    .responseMessage().code(200).message("customer fetched").endResponseMessage()
                     .to("amq:customers.get?transferException=true")
 
                 .delete()
                     .description("delete customer")
                     .param().name("customerId").type(RestParamType.path)
                     .description("customer to delete").endParam()
+                    .responseMessage().code(200).message("customer deleted").endResponseMessage()
                     .to("amq:customers.delete?transferException=true")
 
         rest("/customers/{customerId}/orders").description("orders endpoint")
@@ -105,6 +113,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("get customer's orders").outTypeList(Order.class)
                     .param().name("customerId").type(RestParamType.path)
                     .description("id of customer to fetch orders from").endParam()
+                    .responseMessage().code(200).message("customer's orders fetched").endResponseMessage()
                     .to("amq:customers.orders.list?transferException=true")
                 .put()
                     .description("save new customer order").outType(Order.class)
@@ -112,6 +121,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of customer to own order").endParam()
                     .param().name("order").type(RestParamType.body)
                     .description("order to save").endParam()
+                    .responseMessage().code(200).message("new customer order saved").endResponseMessage()
                     .to("amq:customers.orders.save?transferException=true")
 
                 .patch()
@@ -120,6 +130,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of customer owning order").endParam()
                     .param().name("order").type(RestParamType.body)
                     .description("order to save").endParam()
+                    .responseMessage().code(200).message("customer order updated").endResponseMessage()
                     .to("amq:customers.orders.save?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}").description("individual order endpoint")
@@ -130,6 +141,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of customer owning order").endParam()
                     .param().name("orderId").type(RestParamType.path)
                     .description("id of order to fetch").endParam()
+                    .responseMessage().code(200).message("customer order fetched").endResponseMessage()
                     .to("amq:customers.orders.get?transferException=true")
 
                 .delete()
@@ -138,6 +150,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("customer owning order").endParam()
                     .param().name("orderId").type(RestParamType.path)
                     .description("order to delete").endParam()
+                    .responseMessage().code(200).message("customer order deleted").endResponseMessage()
                     .to("amq:customers.orders.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems").description("order items endpoint")
@@ -148,6 +161,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of customer owning order").endParam()
                     .param().name("orderId").type(RestParamType.path)
                     .description("id of order").endParam()
+                    .responseMessage().code(200).message("order items fetched").endResponseMessage()
                     .to("amq:customers.orders.orderItems.list?transferException=true")
 
                 .put()
@@ -158,6 +172,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of order").endParam()
                     .param().name("orderItem").type(RestParamType.body)
                     .description("orderItem to save").endParam()
+                    .responseMessage().code(200).message("new order item saved").endResponseMessage()
                     .to("amq:customers.orders.orderItems.save?transferException=true")
 
                 .patch()
@@ -168,6 +183,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of order").endParam()
                     .param().name("orderItem").type(RestParamType.body)
                     .description("orderItem to update").endParam()
+                    .responseMessage().code(200).message("order item updated").endResponseMessage()
                     .to("amq:customers.orders.orderItems.save?transferException=true")
 
 
@@ -182,6 +198,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of order").endParam()
                     .param().name("orderItemId").type(RestParamType.path)
                     .description("Id of orderItem to fetch").endParam()
+                    .responseMessage().code(200).message("order item fetched").endResponseMessage()
                     .to("amq:customers.orders.orderItems.get?transferException=true")
 
                 .delete()
@@ -192,24 +209,28 @@ class AppRoute extends SpringRouteBuilder {
                     .description("id of order").endParam()
                     .param().name("orderItems").type(RestParamType.path)
                     .description("orderItem to delete").endParam()
+                    .responseMessage().code(200).message("order item deleted").endResponseMessage()
                     .to("amq:customers.orders.orderItems.delete?transferException=true")
 
         rest("/products").description("products endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
                 .get()
                     .description("list featured products").outTypeList(Product.class)
+                    .responseMessage().code(200).message("featured products fetched").endResponseMessage()
                     .to("amq:products.list.featured?transferException=true")
 
                 .put()
                     .description("save new product").outType(Product.class)
                     .param().name("product").type(RestParamType.body)
                     .description("product to save").endParam()
+                    .responseMessage().code(200).message("new product saved").endResponseMessage()
                     .to("amq:products.save?transferException=true")
 
                 .patch()
                     .description("update product").outType(Product.class)
                     .param().name("product").type(RestParamType.body)
                     .description("product to update").endParam()
+                    .responseMessage().code(200).message("product updated").endResponseMessage()
                     .to("amq:products.save?transferException=true")
 
         rest("/products/{sku}").description("individual product endpoint")
@@ -218,12 +239,14 @@ class AppRoute extends SpringRouteBuilder {
                     .description("get product").outType(Product.class)
                     .param().name("sku").type(RestParamType.path)
                     .description("sku of product to fetch").endParam()
+                    .responseMessage().code(200).message("product fetched").endResponseMessage()
                     .to("amq:products.get?transferException=true")
 
                 .delete()
                     .description("delete product")
                     .param().name("sku").type(RestParamType.path)
                     .description("product to delete").endParam()
+                    .responseMessage().code(200).message("product deleted").endResponseMessage()
                     .to("amq:products.delete?transferException=true")
 
         rest("/products/{sku}/reduce/{quantity}")
@@ -233,6 +256,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("product to reduce").endParam()
                     .param().name("quantity").type(RestParamType.path)
                     .description("reduction quantity").endParam()
+                    .responseMessage().code(200).message("product inventory reduced").endResponseMessage()
                     .to("amq:products.reduce?transferException=true")
 
         rest("/products/{sku}/keywords").description("product keywords endpoint")
@@ -243,6 +267,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("sku product to add keywords to").endParam()
                     .param().name("keywords").type(RestParamType.body)
                     .description("array of keywords to add").endParam()
+                    .responseMessage().code(200).message("keywords added to product").endResponseMessage()
                     .to("amq:products.keywords.add?transferException=true")
 
         rest("/products/keywords/{keyword}").description("keyword lookup endpoint")
@@ -251,6 +276,7 @@ class AppRoute extends SpringRouteBuilder {
                     .description("get products by keywords").outTypeList(Product.class)
                     .param().name("keyword").type(RestParamType.path)
                     .description("keyword to fetch products by").endParam()
+                    .responseMessage().code(200).message("products with keyword fetched").endResponseMessage()
                     .to("amq:products.list.keyword?transferException=true")
 
         rest("admin/reset")

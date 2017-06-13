@@ -10,8 +10,8 @@ class Transaction {
     Integer expYear
     Integer verificationCode
     String billingAddress
-    Long customerId
+    String customerId
     String customerName
-    Long orderNumber
+    String orderNumber
     Double amount
 }
