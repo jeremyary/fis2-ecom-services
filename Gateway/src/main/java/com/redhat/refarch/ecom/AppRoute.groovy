@@ -78,7 +78,7 @@ class AppRoute extends SpringRouteBuilder {
 
                 .delete()
                     .description("delete customer")
-                    .param().name("customer").type(RestParamType.body)
+                    .param().name("customerId").type(RestParamType.path)
                     .description("customer to delete").endParam()
                     .to("amq:customers.delete?transferException=true")
 
@@ -122,9 +122,11 @@ class AppRoute extends SpringRouteBuilder {
                     .to("amq:customers.orders.save?transferException=true")
 
                 .delete()
-                    .description("authenticate customer")
-                    .param().name("customer").type(RestParamType.body)
-                    .description("customer to delete").endParam()
+                    .description("delete customer order")
+                    .param().name("customerId").type(RestParamType.path)
+                    .description("customer owning order").endParam()
+                    .param().name("orderId").type(RestParamType.path)
+                    .description("order to delete").endParam()
                     .to("amq:customers.orders.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}").description("individual order endpoint")
@@ -168,13 +170,13 @@ class AppRoute extends SpringRouteBuilder {
                     .to("amq:customers.orders.orderItems.save?transferException=true")
 
                 .delete()
-                    .description("delete order items")
+                    .description("delete order item")
                     .param().name("customerId").type(RestParamType.path)
                     .description("id of customer owning order").endParam()
                     .param().name("orderId").type(RestParamType.path)
                     .description("id of order").endParam()
-                    .param().name("orderItems").type(RestParamType.body)
-                    .description("list of orderItems to delete").endParam()
+                    .param().name("orderItems").type(RestParamType.path)
+                    .description("orderItem to delete").endParam()
                     .to("amq:customers.orders.orderItems.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems/{orderItemId}")
@@ -210,7 +212,7 @@ class AppRoute extends SpringRouteBuilder {
 
                 .delete()
                     .description("delete product")
-                    .param().name("product").type(RestParamType.body)
+                    .param().name("productId").type(RestParamType.path)
                     .description("product to delete").endParam()
                     .to("amq:products.delete?transferException=true")
 

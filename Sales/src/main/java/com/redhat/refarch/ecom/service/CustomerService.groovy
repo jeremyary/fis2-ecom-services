@@ -33,8 +33,8 @@ class CustomerService {
         return customerRepository.save(customer)
     }
 
-    void deleteCustomer(Customer customer) {
-        customerRepository.delete(customer)
+    void deleteCustomer(String customerId) {
+        customerRepository.delete(customerId)
     }
     
     Customer authenticate(Customer customer) {
@@ -58,8 +58,8 @@ class CustomerService {
         return orderRepository.save(order)
     }
 
-    void deleteOrder(Order order) {
-        orderRepository.delete(order)
+    void deleteOrder(String orderId) {
+        orderRepository.delete(orderId)
     }
 
     OrderItem getOrderItem(String orderItemId) {
@@ -81,7 +81,7 @@ class CustomerService {
         return result
     }
 
-    void deleteOrderItem(OrderItem orderItem) {
-        orderItemRepository.delete(orderItem)
+    void deleteOrderItem(String orderItemId) {
+        orderItemRepository.delete(orderItemId)
     }
 }

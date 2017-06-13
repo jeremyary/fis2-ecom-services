@@ -26,6 +26,7 @@ import com.redhat.refarch.ecom.repository.ProductRepository
 import org.apache.camel.Consume
 import org.apache.http.HttpStatus
 import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
@@ -106,23 +107,22 @@ class AdminService {
         uriBuilder = getUriBuilder("customers", "authenticate")
         HttpPost post = new HttpPost(uriBuilder.build())
         post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-        customer = (Customer) httpClient.execute(post).getEntity()
+        customer = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), Customer.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
         Assert.assertEquals(customer, fetchedCustomer)
 
         // delete customer
-        uriBuilder = getUriBuilder("customers", "delete")
-        post = new HttpPost(uriBuilder.build())
-        post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-        httpClient.execute(post)
+        uriBuilder = getUriBuilder("customers", "delete", customer.getId())
+        HttpDelete delete = new HttpDelete(uriBuilder.build())
+        httpClient.execute(delete)
         Assert.assertNull(customerRepository.getByUsername("bobdole"))
 
         // patch customer
         uriBuilder = getUriBuilder("customers")
         HttpPatch patch = new HttpPatch(uriBuilder.build())
         patch.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-        customer = (Customer) httpClient.execute(patch).getEntity()
+        customer = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Customer.class)
         fetchedCustomer = customerRepository.getByUsername("bobdole")
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
@@ -131,7 +131,8 @@ class AdminService {
         // list featured products
         uriBuilder = getUriBuilder("products")
         get = new HttpGet(uriBuilder.build())
-        List<Product> products = (List<Product>) httpClient.execute(get).getEntity()
+        List<Product> products = Arrays.asList(
+                gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Product[].class))
         List<Product> fetchedProducts = productRepository.findByIsFeatured(true)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(products)
@@ -141,7 +142,7 @@ class AdminService {
         // list products by keyword
         uriBuilder = getUriBuilder("products", "keywords", "Electronics")
         get = new HttpGet(uriBuilder.build())
-        products = (List<Product>) httpClient.execute(get).getEntity()
+        products = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Product[].class))
         fetchedProducts = productRepository.findByKeywords("Electronics")
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(products)

@@ -33,7 +33,7 @@ class ProductService {
     }
 
     void deleteProduct(String sku) {
-        productRepository.delete(productRepository.getBySku(sku))
+        productRepository.delete(sku)
     }
 
     Response reduceInventory(Inventory[] inventoryAdjustment) {
