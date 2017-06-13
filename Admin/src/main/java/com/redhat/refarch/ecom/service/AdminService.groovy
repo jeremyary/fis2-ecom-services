@@ -55,16 +55,21 @@ class AdminService {
     @Autowired
     OrderItemRepository orderItemRepository
 
+    URIBuilder uriBuilder
+
+    CloseableHttpClient httpClient
+
+    Gson gson = new Gson()
+
+    StringWriter stringWriter = new StringWriter()
+
     void resetData() {
 
         try {
-            customerRepository.deleteAll()
-            productRepository.deleteAll()
-            orderRepository.deleteAll()
-            orderItemRepository.deleteAll()
+            [customerRepository, productRepository, orderRepository, orderItemRepository].each { it.deleteAll() }
 
-            JsonReader jsonReader = new JsonReader(new InputStreamReader(AdminService.class.getResourceAsStream
-                    ("/product_filler.json")))
+            JsonReader jsonReader = new JsonReader(
+                    new InputStreamReader(AdminService.class.getResourceAsStream("/product_filler.json")))
 
             productRepository.save(Arrays.asList(new Gson().fromJson(jsonReader, Product[].class)))
 
@@ -78,59 +83,16 @@ class AdminService {
         try {
             resetData()
 
-            Gson gson = new Gson()
+            httpClient = HttpClients.createDefault()
 
             Customer customer = new Customer()
-            customer.setName("Bob Dole")
-            customer.setAddress("123 Somewhere St")
-            customer.setTelephone("1234567890")
-            customer.setEmail("bob@dole.com")
-            customer.setUsername("bobdole")
-            customer.setPassword("password")
+            customer.name = "Bob Dole"
+            customer.address = "123 Somewhere St"
+            customer.telephone = "1234567890"
+            customer.email = "bob@dole.com"
+            customer.username = "bobdole"
+            customer.password = "password"
 
-            // save new customer
-            CloseableHttpClient httpClient = HttpClients.createDefault()
-            URIBuilder uriBuilder = getUriBuilder("customers")
-            HttpPut put = new HttpPut(uriBuilder.build())
-            put.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-            CloseableHttpResponse response = httpClient.execute(put)
-            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Customer fetchedCustomer = customerRepository.getByUsername("bobdole")
-            Assert.assertNotNull(fetchedCustomer)
-
-            // get customer
-            uriBuilder = getUriBuilder("customers", fetchedCustomer.id)
-            HttpGet get = new HttpGet(uriBuilder.build())
-            customer = gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Customer.class)
-            Assert.assertNotNull(customer)
-            Assert.assertEquals(customer, fetchedCustomer)
-
-            // authenticate customer
-            uriBuilder = getUriBuilder("customers", "authenticate")
-            HttpPost post = new HttpPost(uriBuilder.build())
-            post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-            customer = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), Customer.class)
-            Assert.assertNotNull(customer)
-            Assert.assertEquals(customer, fetchedCustomer)
-
-            // delete customer
-            uriBuilder = getUriBuilder("customers", customer.getId())
-            HttpDelete delete = new HttpDelete(uriBuilder.build())
-            response = httpClient.execute(delete)
-            EntityUtils.consumeQuietly(response.getEntity())
-            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNull(customerRepository.getByUsername("bobdole"))
-
-            // patch customer
-            uriBuilder = getUriBuilder("customers")
-            HttpPatch patch = new HttpPatch(uriBuilder.build())
-            patch.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
-            customer = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Customer.class)
-            fetchedCustomer = customerRepository.getByUsername("bobdole")
-            Assert.assertNotNull(customer)
-            Assert.assertEquals(customer, fetchedCustomer)
-
-            // add product
             Product newProduct = new Product.ProductBuilder()
                     .name("Fancy TV")
                     .description("Fancy television")
@@ -143,202 +105,230 @@ class AdminService {
                     .price(99.99)
                     .image("TV")
                     .build()
-            uriBuilder = getUriBuilder("products")
-            put = new HttpPut(uriBuilder.build())
-            put.setEntity(new StringEntity(gson.toJson(newProduct).toString(), ContentType.APPLICATION_JSON))
-            Product product = gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), Product.class)
+
+            Order newOrder = new Order()
+            newOrder.status = Order.Status.Initial
+            newOrder.customerId = customer.id
+
+            OrderItem newOrderItem = new OrderItem()
+            newOrderItem.setQuantity(1)
+
+            // save new customer
+            uri("customers")
+            customer = (Customer) doPut(customer, Customer.class)
+            Assert.assertNotNull(customer)
+            Assert.assertNotNull(customer.id)
+            Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
+
+            // get customer
+            uri("customers", customer.id)
+            customer = (Customer) doGet(Customer.class)
+            Assert.assertNotNull(customer)
+            Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
+
+            // authenticate customer
+            uri("customers", "authenticate")
+            customer = (Customer) doPost(customer, Customer.class)
+            Assert.assertNotNull(customer)
+            Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
+
+            // delete customer
+            uri("customers", customer.getId())
+            CloseableHttpResponse response = doDelete()
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNull(customerRepository.getByUsername("bobdole"))
+
+            // patch customer
+            uri("customers")
+            customer = (Customer) doPatch(customer, Customer.class)
+            Assert.assertNotNull(customer)
+            Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
+
+            // add product
+            uri("products")
+            Product product = (Product) doPut(newProduct, Product.class)
             Assert.assertNotNull(product)
             newProduct.setSku(product.sku)
             Assert.assertEquals(product, newProduct)
 
-            // update product
-            product.setDescription("foo")
-            uriBuilder = getUriBuilder("products")
-            patch = new HttpPatch(uriBuilder.build())
-            patch.setEntity(new StringEntity(gson.toJson(product).toString(), ContentType.APPLICATION_JSON))
-            product = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Product.class)
-            Assert.assertNotNull(product)
-            Assert.assertTrue(product.description == "foo")
-            Product fetchedProduct = productRepository.findOne(product.sku)
-            Assert.assertEquals(product, fetchedProduct)
-
             // add keywords to product
-            uriBuilder = getUriBuilder("products", product.sku, "keywords")
-            post = new HttpPost(uriBuilder.build())
-            String[] keywords = ["Electronics", "TV"]
-            post.setEntity(new StringEntity(gson.toJson(keywords).toString(), ContentType.APPLICATION_JSON))
-            response = httpClient.execute(post)
-            EntityUtils.consumeQuietly(response.getEntity())
+            uri("products", product.sku, "keywords")
+            response = doSilentPost(["Electronics", "TV"])
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             product = productRepository.findOne(product.sku)
-            Assert.assertTrue(product.getKeywords().containsAll(keywords))
+            Assert.assertTrue(product.getKeywords().containsAll(["Electronics", "TV"]))
 
             // reduce product
-            uriBuilder = getUriBuilder("products", product.sku, "reduce", "1")
-            get = new HttpGet(uriBuilder.build())
-            response = httpClient.execute(get)
-            EntityUtils.consumeQuietly(response.getEntity())
+            uri("products", product.sku, "reduce", "1")
+            response = doSilentGet()
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            product = productRepository.findOne(product.sku)
-            Assert.assertTrue(product.getAvailability() == 4)
+            Assert.assertTrue(productRepository.findOne(product.sku).getAvailability() == 4)
 
             // delete product
-            uriBuilder = getUriBuilder("products", product.sku)
-            delete = new HttpDelete(uriBuilder.build())
-            response = httpClient.execute(delete)
-            EntityUtils.consumeQuietly(response.getEntity())
+            uri("products", product.sku)
+            response = doDelete()
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             Assert.assertNull(productRepository.findOne(product.sku))
 
+            // update product
+            product.setDescription("foo")
+            uri("products")
+            product = (Product) doPatch(product, Product.class)
+            Assert.assertNotNull(product)
+            Assert.assertTrue(product.description == "foo")
+
             // list featured products
-            uriBuilder = getUriBuilder("products")
-            get = new HttpGet(uriBuilder.build())
-            List<Product> products = Arrays.asList(
-                    gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Product[].class))
-            List<Product> fetchedProducts = productRepository.findByIsFeatured(true)
+            uri("products")
+            List<Product> products = doGetList(Product[].class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(products)
-            Assert.assertTrue(products.size() > 0)
-            Assert.assertThat(products, IsIterableContainingInOrder.contains(fetchedProducts.toArray()))
+            Assert.assertThat(products, IsIterableContainingInOrder.contains(
+                    productRepository.findByIsFeatured(true).toArray()))
 
             // list products by keyword
-            uriBuilder = getUriBuilder("products", "keywords", "Electronics")
-            get = new HttpGet(uriBuilder.build())
-            products = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Product[].class))
-            fetchedProducts = productRepository.findByKeywords("Electronics")
+            uri("products", "keywords", "Electronics")
+            products = doGetList(Product[].class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(products)
-            Assert.assertTrue(products.size() > 0)
-            Assert.assertThat(products, IsIterableContainingInAnyOrder.containsInAnyOrder(fetchedProducts.toArray()))
+            Assert.assertThat(products, IsIterableContainingInAnyOrder.containsInAnyOrder(
+                    productRepository.findByKeywords("Electronics").toArray()))
 
             // get product to check availability
-            fetchedProduct = fetchedProducts.get(0)
-            uriBuilder = getUriBuilder("products", fetchedProduct.getSku())
-            get = new HttpGet(uriBuilder.build())
-            product = gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Product.class)
+            uri("products", product.getSku())
+            product = (Product) doGet(Product.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             Assert.assertNotNull(products)
-            Assert.assertEquals(product, fetchedProduct)
+            Assert.assertEquals(product, productRepository.findOne(product.sku))
+            Assert.assertEquals(product.availability, productRepository.findOne(product.sku).availability)
 
             // add initial order
-            Order newOrder = new Order()
-            newOrder.setStatus(Order.Status.Initial)
-            newOrder.setCustomerId(customer.id)
-            uriBuilder = getUriBuilder("customers", customer.id, "orders")
-            put = new HttpPut(uriBuilder.build())
-            put.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
-            Order order = gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), Order.class)
+            uri("customers", customer.id, "orders")
+            Order order = (Order) doPut(newOrder, Order.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(order)
-            Order fetchedOrder = orderRepository.findOne(order.id)
-            Assert.assertEquals(order, fetchedOrder)
+            Assert.assertEquals(order, orderRepository.findOne(order.id))
 
             // list orders
-            uriBuilder = getUriBuilder("customers", customer.id, "orders")
-            get = new HttpGet(uriBuilder.build())
-            List<Order> orders = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()),
-                    Order[].class))
+            uri("customers", customer.id, "orders")
+            List<Order> orders = doGetList(Order[].class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(orders)
-            Assert.assertTrue(orders.size() == 1)
-            Assert.assertTrue(orders.contains(fetchedOrder))
+            Assert.assertTrue(orders.contains(order))
 
             // delete order
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id)
-            delete = new HttpDelete(uriBuilder.build())
-            response = httpClient.execute(delete)
-            EntityUtils.consumeQuietly(response.getEntity())
+            uri("customers", customer.id, "orders", order.id)
+            response = doDelete()
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNull(orderRepository.findOne(fetchedOrder.id))
+            Assert.assertNull(orderRepository.findOne(order.id))
 
             // update order
-            newOrder.setId(fetchedOrder.id)
-            newOrder.setStatus(Order.Status.InProgress)
-            uriBuilder = getUriBuilder("customers", customer.id, "orders")
-            patch = new HttpPatch(uriBuilder.build())
-            patch.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
-            order = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Order.class)
+            order.setStatus(Order.Status.InProgress)
+            uri("customers", customer.id, "orders")
+            order = (Order) doPatch(order, Order.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(order)
-            fetchedOrder = orderRepository.findOne(order.id)
-            Assert.assertEquals(order, fetchedOrder)
+            Assert.assertEquals(order, orderRepository.findOne(order.id))
 
             // add order item
-            OrderItem newOrderItem = new OrderItem()
-            newOrderItem.setSku(product.sku)
-            newOrderItem.setQuantity(1)
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
-            put = new HttpPut(uriBuilder.build())
-            put.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
-            OrderItem orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), OrderItem
-                    .class)
+            newOrderItem.sku = product.sku
+            uri("customers", customer.id, "orders", order.id, "orderItems")
+            OrderItem orderItem = (OrderItem) doPut(newOrderItem, OrderItem.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(orderItem)
-            OrderItem fetchedOrderItem = orderItemRepository.findOne(orderItem.id)
-            Assert.assertEquals(orderItem, fetchedOrderItem)
-            fetchedOrder = orderRepository.findOne(fetchedOrder.id)
-            Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
-            Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
+            Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
+            order = orderRepository.findOne(order.id)
+            Assert.assertTrue(order.orderItemIds.size() == 1)
+            Assert.assertTrue(order.orderItemIds.contains(orderItem.id))
 
             // update order item
-            newOrderItem.setQuantity(3)
-            newOrderItem.setId(fetchedOrderItem.id)
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
-            patch = new HttpPatch(uriBuilder.build())
-            patch.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
-            orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), OrderItem.class)
+            orderItem.quantity = 3
+            uri("customers", customer.id, "orders", order.id, "orderItems")
+            orderItem = (OrderItem) doPatch(orderItem, OrderItem.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(orderItem)
-            fetchedOrderItem = orderItemRepository.findOne(orderItem.id)
-            Assert.assertEquals(orderItem, fetchedOrderItem)
-            Assert.assertTrue(fetchedOrderItem.quantity == 3)
-            fetchedOrder = orderRepository.findOne(fetchedOrder.id)
-            Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
-            Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
+            Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
+            Assert.assertTrue(orderItem.quantity == 3)
+            order = orderRepository.findOne(order.id)
+            Assert.assertTrue(order.orderItemIds.size() == 1)
+            Assert.assertTrue(order.orderItemIds.contains(orderItem.id))
 
             // get order item
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems",
-                    fetchedOrderItem.id)
-            get = new HttpGet(uriBuilder.build())
-            fetchedOrderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), OrderItem.class)
-            Assert.assertNotNull(fetchedOrderItem)
-            Assert.assertEquals(fetchedOrderItem, orderItem)
+            uri("customers", customer.id, "orders", order.id, "orderItems", orderItem.id)
+            orderItem = (OrderItem) doGet(OrderItem.class)
+            Assert.assertNotNull(orderItem)
+            Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
 
             // list order items
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems")
-            get = new HttpGet(uriBuilder.build())
-            List<OrderItem> orderItems = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get)
-                    .getEntity()),OrderItem[].class))
+            uri("customers", customer.id, "orders", order.id, "orderItems")
+            List<OrderItem> orderItems = doGetList(OrderItem[].class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNotNull(orderItems)
-            Assert.assertTrue(orderItems.size() == 1)
-            Assert.assertTrue(orderItems.contains(fetchedOrderItem))
+            Assert.assertTrue(orderItems.contains(orderItem))
 
             // delete order item
-            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems",
-                    fetchedOrderItem.id)
-            delete = new HttpDelete(uriBuilder.build())
-            response = httpClient.execute(delete)
-            EntityUtils.consumeQuietly(response.getEntity())
+            uri("customers", customer.id, "orders", order.id, "orderItems", orderItem.id)
+            response = doDelete()
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNull(orderItemRepository.findOne(fetchedOrderItem.id))
+            Assert.assertNull(orderItemRepository.findOne(orderItem.id))
 
         } catch (Exception e) {
             e.printStackTrace()
         }
     }
 
-    private static URIBuilder getUriBuilder(Object... path) {
+    private Object doPut(Object objToMarshal, Class clazz) {
 
-        URIBuilder uriBuilder = new URIBuilder()
-                .setScheme("http")
-                .setHost("ecom.rhmap.ose")
+        HttpPut put = new HttpPut(uriBuilder.build())
+        put.setEntity(new StringEntity(gson.toJson(objToMarshal).toString(), ContentType.APPLICATION_JSON))
+        return gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), clazz)
+    }
 
-        StringWriter stringWriter = new StringWriter()
-        path.each {
-            stringWriter.append("/${String.valueOf(it)}")
+    private Object doGet(Class clazz) {
+        HttpGet get = new HttpGet(uriBuilder.build())
+        return gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), clazz)
+    }
+
+    private List doGetList(Class clazz) {
+        HttpGet get = new HttpGet(uriBuilder.build())
+        return  Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), clazz))
+    }
+
+    private CloseableHttpResponse doSilentGet() {
+        HttpGet get = new HttpGet(uriBuilder.build())
+        CloseableHttpResponse response = httpClient.execute(get)
+        EntityUtils.consumeQuietly(response.getEntity())
+        return response
+    }
+
+    private Object doPost(Object objToMarshal, Class clazz) {
+        HttpPost post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(objToMarshal).toString(), ContentType.APPLICATION_JSON))
+        return gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), clazz)
+    }
+
+    private CloseableHttpResponse doSilentPost(Object objToMarshal) {
+        HttpPost post = new HttpPost(uriBuilder.build())
+        post.setEntity(new StringEntity(gson.toJson(objToMarshal).toString(), ContentType.APPLICATION_JSON))
+        CloseableHttpResponse response = httpClient.execute(post)
+        EntityUtils.consumeQuietly(response.getEntity())
+        return response
+    }
+
+    private Object doPatch(Object objToMarshal, Class clazz) {
+        HttpPatch patch = new HttpPatch(uriBuilder.build())
+        patch.setEntity(new StringEntity(gson.toJson(objToMarshal).toString(), ContentType.APPLICATION_JSON))
+        return gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), clazz)
+    }
+
+    private CloseableHttpResponse doDelete() {
+        HttpDelete delete = new HttpDelete(uriBuilder.build())
+        CloseableHttpResponse response = httpClient.execute(delete)
+        EntityUtils.consumeQuietly(response.getEntity())
+        return response
+    }
+
+    private void uri(Object... path) {
+
+        if (uriBuilder == null) {
+            uriBuilder = new URIBuilder()
+                    .setScheme("http")
+                    .setHost("ecom.rhmap.ose")
         }
+
+        stringWriter.buffer.length = 0
+        path.each { stringWriter.append("/${String.valueOf(it)}") }
         uriBuilder.setPath(stringWriter.toString())
-        return uriBuilder
     }
 }

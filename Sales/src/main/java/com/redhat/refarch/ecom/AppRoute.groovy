@@ -60,7 +60,7 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.orders.save")
                 .unmarshal().json(JsonLibrary.Jackson, Order.class)
-                .bean(customerService, "saveOrder")
+                .bean(customerService, 'saveOrder(${header.customerId}, ${body})')
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:customers.orders.delete")

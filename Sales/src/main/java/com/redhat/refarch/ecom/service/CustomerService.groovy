@@ -55,7 +55,8 @@ class CustomerService {
         return orderRepository.findByCustomerId(customerId)
     }
 
-    Order saveOrder(Order order) {
+    Order saveOrder(String customerId, Order order) {
+        order.customerId = customerId
         return orderRepository.save(order)
     }
 
