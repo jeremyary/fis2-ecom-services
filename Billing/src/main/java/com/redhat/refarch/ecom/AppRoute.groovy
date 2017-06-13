@@ -37,6 +37,6 @@ class AppRoute extends SpringRouteBuilder {
                 .marshal().json(JsonLibrary.Jackson)
 
         from("amq:billing.refund")
-                .bean(billingService, "refund")
+                .bean(billingService, 'refund(${header.transactionNumber})')
     }
 }
