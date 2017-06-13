@@ -76,12 +76,6 @@ class AppRoute extends SpringRouteBuilder {
                     .description("customer to update").endParam()
                     .to("amq:customers.save?transferException=true")
 
-                .delete()
-                    .description("delete customer")
-                    .param().name("customerId").type(RestParamType.path)
-                    .description("customer to delete").endParam()
-                    .to("amq:customers.delete?transferException=true")
-
         rest("/customers/authenticate").description("customer authentication endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
                 .post()
@@ -97,6 +91,12 @@ class AppRoute extends SpringRouteBuilder {
                     .param().name("customerId").type(RestParamType.path)
                     .description("id of customer to fetch").endParam()
                     .to("amq:customers.get?transferException=true")
+
+                .delete()
+                    .description("delete customer")
+                    .param().name("customerId").type(RestParamType.path)
+                    .description("customer to delete").endParam()
+                    .to("amq:customers.delete?transferException=true")
 
         rest("/customers/{customerId}/orders").description("orders endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
@@ -121,14 +121,6 @@ class AppRoute extends SpringRouteBuilder {
                     .description("order to save").endParam()
                     .to("amq:customers.orders.save?transferException=true")
 
-                .delete()
-                    .description("delete customer order")
-                    .param().name("customerId").type(RestParamType.path)
-                    .description("customer owning order").endParam()
-                    .param().name("orderId").type(RestParamType.path)
-                    .description("order to delete").endParam()
-                    .to("amq:customers.orders.delete?transferException=true")
-
         rest("/customers/{customerId}/orders/{orderId}").description("individual order endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
                 .get()
@@ -138,6 +130,14 @@ class AppRoute extends SpringRouteBuilder {
                     .param().name("orderId").type(RestParamType.path)
                     .description("id of order to fetch").endParam()
                     .to("amq:customers.orders.get?transferException=true")
+
+                .delete()
+                .description("delete customer order")
+                    .param().name("customerId").type(RestParamType.path)
+                    .description("customer owning order").endParam()
+                    .param().name("orderId").type(RestParamType.path)
+                    .description("order to delete").endParam()
+                    .to("amq:customers.orders.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems").description("order items endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
@@ -169,15 +169,6 @@ class AppRoute extends SpringRouteBuilder {
                     .description("list of orderItems to update").endParam()
                     .to("amq:customers.orders.orderItems.save?transferException=true")
 
-                .delete()
-                    .description("delete order item")
-                    .param().name("customerId").type(RestParamType.path)
-                    .description("id of customer owning order").endParam()
-                    .param().name("orderId").type(RestParamType.path)
-                    .description("id of order").endParam()
-                    .param().name("orderItems").type(RestParamType.path)
-                    .description("orderItem to delete").endParam()
-                    .to("amq:customers.orders.orderItems.delete?transferException=true")
 
         rest("/customers/{customerId}/orders/{orderId}/orderItems/{orderItemId}")
                 .description("individual order item endpoint")
@@ -191,6 +182,16 @@ class AppRoute extends SpringRouteBuilder {
                     .param().name("orderItemId").type(RestParamType.path)
                     .description("Id of orderItem to fetch").endParam()
                     .to("amq:customers.orders.orderItems.get?transferException=true")
+
+                .delete()
+                    .description("delete order item")
+                    .param().name("customerId").type(RestParamType.path)
+                    .description("id of customer owning order").endParam()
+                    .param().name("orderId").type(RestParamType.path)
+                    .description("id of order").endParam()
+                    .param().name("orderItems").type(RestParamType.path)
+                    .description("orderItem to delete").endParam()
+                    .to("amq:customers.orders.orderItems.delete?transferException=true")
 
         rest("/products").description("products endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
@@ -210,12 +211,6 @@ class AppRoute extends SpringRouteBuilder {
                     .description("product to update").endParam()
                     .to("amq:products.save?transferException=true")
 
-                .delete()
-                    .description("delete product")
-                    .param().name("productId").type(RestParamType.path)
-                    .description("product to delete").endParam()
-                    .to("amq:products.delete?transferException=true")
-
         rest("/products/{sku}").description("individual product endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
                 .get()
@@ -223,6 +218,12 @@ class AppRoute extends SpringRouteBuilder {
                     .param().name("sku").type(RestParamType.path)
                     .description("sku of product to fetch").endParam()
                     .to("amq:products.get?transferException=true")
+
+                .delete()
+                    .description("delete product")
+                    .param().name("sku").type(RestParamType.path)
+                    .description("product to delete").endParam()
+                    .to("amq:products.delete?transferException=true")
 
         rest("/products/{sku}/keywords").description("product keywords endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)

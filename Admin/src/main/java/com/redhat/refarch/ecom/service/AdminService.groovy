@@ -113,7 +113,7 @@ class AdminService {
         Assert.assertEquals(customer, fetchedCustomer)
 
         // delete customer
-        uriBuilder = getUriBuilder("customers", "delete", customer.getId())
+        uriBuilder = getUriBuilder("customers", customer.getId())
         HttpDelete delete = new HttpDelete(uriBuilder.build())
         httpClient.execute(delete)
         Assert.assertNull(customerRepository.getByUsername("bobdole"))
