@@ -278,6 +278,11 @@ class AdminService {
         transaction.setExpYear(2010)
         result = (Result) doPost(transaction, Result.class)
         Assert.assertEquals(result.status, Result.Status.FAILURE)
+
+        //test refund
+        uri("billing", "refund", "123")
+        response = doSilentGet()
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
     }
 
     private Object doPut(Object objToMarshal, Class clazz) {
