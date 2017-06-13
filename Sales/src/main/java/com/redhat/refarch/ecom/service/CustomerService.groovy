@@ -83,7 +83,8 @@ class CustomerService {
 
         OrderItem result = orderItemRepository.save(orderItem)
         Order order = orderRepository.getById(orderId)
-        order.getOrderItemIds().add(result.getId())
+        if (!order.getOrderItemIds().contains(result.getId()))
+            order.getOrderItemIds().add(result.getId())
         orderRepository.save(order)
         return result
     }
