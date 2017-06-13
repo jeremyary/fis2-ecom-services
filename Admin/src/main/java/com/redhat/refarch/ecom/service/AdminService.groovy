@@ -115,8 +115,6 @@ class AdminService {
         newOrderItem.setQuantity(1)
 
         Transaction transaction = new Transaction()
-        transaction.customerId = customer.id
-        transaction.orderNumber = order.id
         transaction.amount = 100.99
         transaction.creditCardNumber = 123457890123456
         transaction.expYear = 2030
@@ -273,6 +271,8 @@ class AdminService {
         Assert.assertNull(orderItemRepository.findOne(orderItem.id))
 
         //test billing process
+        transaction.customerId = customer.id
+        transaction.orderNumber = order.id
         uri("billing", "process")
         Result result = (Result) doPost(transaction, Result.class)
         Assert.assertEquals(result.status, Result.Status.SUCCESS)
