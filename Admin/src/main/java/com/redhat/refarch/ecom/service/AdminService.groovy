@@ -90,7 +90,7 @@ class AdminService {
         HttpPut put = new HttpPut(uriBuilder.build())
         put.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
         CloseableHttpResponse response = httpClient.execute(put)
-        Assert.assertFalse(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Customer fetchedCustomer = customerRepository.getByUsername("bobdole")
         Assert.assertNotNull(fetchedCustomer)
 

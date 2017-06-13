@@ -39,7 +39,7 @@ class CustomerService {
     
     Customer authenticate(Customer customer) {
 
-        Customer result = getCustomer(customer.getUsername())
+        Customer result = customerRepository.getByUsername(customer.getUsername())
         if (result.getPassword() != customer.getPassword()) {
             throw new WebApplicationException(HttpURLConnection.HTTP_UNAUTHORIZED)
         }
