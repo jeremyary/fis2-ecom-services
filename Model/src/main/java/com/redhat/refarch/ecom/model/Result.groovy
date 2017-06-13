@@ -13,6 +13,6 @@ class Result {
     String name
     String customerId
     String orderNumber
-    Date transactionDate
+    Long transactionDate
     Integer transactionNumber
 }

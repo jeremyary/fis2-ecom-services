@@ -44,7 +44,7 @@ class BillingService {
 
         result.setStatus(calendar.after(now) ? Status.SUCCESS : Status.FAILURE)
         result.transactionNumber = random.nextInt(9000000) + 1000000
-        result.transactionDate = Calendar.getInstance().getTime()
+        result.transactionDate = Calendar.getInstance().getTimeInMillis()
         return result
     }
 
