@@ -1,5 +1,8 @@
 package com.redhat.refarch.ecom.model
 
+import groovy.transform.EqualsAndHashCode
+
+@EqualsAndHashCode
 class Result {
 
     static final Random random = new Random()
@@ -16,12 +19,4 @@ class Result {
     Integer transactionNumber
 
     Result() {}
-
-    Result(String name, Long customerId, Long orderNumber) {
-        this.name = name
-        this.customerId = customerId
-        this.orderNumber = orderNumber
-        this.transactionNumber = random.nextInt(9000000) + 1000000
-        this.transactionDate = Calendar.getInstance().getTime()
-    }
 }

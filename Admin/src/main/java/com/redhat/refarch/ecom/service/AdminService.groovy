@@ -35,6 +35,7 @@ import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.util.EntityUtils
 import org.junit.Assert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -96,7 +97,7 @@ class AdminService {
         // get customer
         uriBuilder = getUriBuilder("customers", fetchedCustomer.id)
         HttpGet get = new HttpGet(uriBuilder.build())
-        customer = (Customer) httpClient.execute(get).getEntity()
+        customer =  gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Customer.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
         Assert.assertEquals(customer, fetchedCustomer)
