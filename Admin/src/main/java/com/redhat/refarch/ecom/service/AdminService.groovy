@@ -55,7 +55,6 @@ class AdminService {
     @Autowired
     OrderItemRepository orderItemRepository
 
-    @Consume(uri = "amq:admin.reset")
     void resetData() {
 
         try {
@@ -74,7 +73,6 @@ class AdminService {
         }
     }
 
-    @Consume(uri = "amq:admin.testApi")
     void testApi() {
 
         try {
@@ -190,7 +188,7 @@ class AdminService {
             response = httpClient.execute(delete)
             EntityUtils.consumeQuietly(response.getEntity())
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-            Assert.assertNull(orderRepository.findOne(product.sku))
+            Assert.assertNull(productRepository.findOne(product.sku))
 
             // list featured products
             uriBuilder = getUriBuilder("products")
@@ -225,6 +223,7 @@ class AdminService {
             // add initial order
             Order newOrder = new Order()
             newOrder.setStatus(Order.Status.Initial)
+            newOrder.setCustomerId(customer.id)
             uriBuilder = getUriBuilder("customers", customer.id, "orders")
             put = new HttpPut(uriBuilder.build())
             put.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
@@ -232,6 +231,36 @@ class AdminService {
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             Assert.assertNotNull(order)
             Order fetchedOrder = orderRepository.findOne(order.id)
+            Assert.assertEquals(order, fetchedOrder)
+
+            // list orders
+            uriBuilder = getUriBuilder("customers", customer.id, "orders")
+            get = new HttpGet(uriBuilder.build())
+            List<Order> orders = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()),
+                    Order[].class))
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(orders)
+            Assert.assertTrue(orders.size() == 1)
+            Assert.assertTrue(orders.contains(fetchedOrder))
+
+            // delete order
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id)
+            delete = new HttpDelete(uriBuilder.build())
+            response = httpClient.execute(delete)
+            EntityUtils.consumeQuietly(response.getEntity())
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNull(orderRepository.findOne(fetchedOrder.id))
+
+            // update order
+            newOrder.setId(fetchedOrder.id)
+            newOrder.setStatus(Order.Status.InProgress)
+            uriBuilder = getUriBuilder("customers", customer.id, "orders")
+            patch = new HttpPatch(uriBuilder.build())
+            patch.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
+            order = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Order.class)
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(order)
+            fetchedOrder = orderRepository.findOne(order.id)
             Assert.assertEquals(order, fetchedOrder)
 
             // add order item
@@ -253,6 +282,7 @@ class AdminService {
 
             // update order item
             newOrderItem.setQuantity(3)
+            newOrderItem.setId(fetchedOrderItem.id)
             uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
             patch = new HttpPatch(uriBuilder.build())
             patch.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
@@ -266,10 +296,32 @@ class AdminService {
             Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
             Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
 
-            // update order
+            // get order item
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems",
+                    fetchedOrderItem.id)
+            get = new HttpGet(uriBuilder.build())
+            fetchedOrderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), OrderItem.class)
+            Assert.assertNotNull(fetchedOrderItem)
+            Assert.assertEquals(fetchedOrderItem, orderItem)
 
-            // delete order
+            // list order items
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems")
+            get = new HttpGet(uriBuilder.build())
+            List<OrderItem> orderItems = Arrays.asList(gson.fromJson(EntityUtils.toString(httpClient.execute(get)
+                    .getEntity()),OrderItem[].class))
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(orderItems)
+            Assert.assertTrue(orderItems.size() == 1)
+            Assert.assertTrue(orderItems.contains(fetchedOrderItem))
 
+            // delete order item
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", fetchedOrder.id, "orderItems",
+                    fetchedOrderItem.id)
+            delete = new HttpDelete(uriBuilder.build())
+            response = httpClient.execute(delete)
+            EntityUtils.consumeQuietly(response.getEntity())
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNull(orderItemRepository.findOne(fetchedOrderItem.id))
 
         } catch (Exception e) {
             e.printStackTrace()
