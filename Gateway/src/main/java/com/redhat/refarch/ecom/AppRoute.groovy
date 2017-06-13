@@ -50,11 +50,11 @@ class AppRoute extends SpringRouteBuilder {
                 .endResponseMessage()
                     .route()
                     .to("amq:billing.process?transferException=true")
-                .wireTap("direct:warehouse")
+                    .wireTap("direct:warehouse")
 
         from("direct:warehouse")
                 .routeId("warehouseMsgGateway")
-                .filter(simple("${bodyAs(String)} contains 'SUCCESS'"))
+                .filter(simple('${bodyAs(String)} contains "SUCCESS"'))
                 .inOnly("amq:topic:warehouse.fulfill")
 
         rest("/billing/refund/{transactionNumber}").description("billing refunds endpoint")
