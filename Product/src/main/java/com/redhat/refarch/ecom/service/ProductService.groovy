@@ -32,8 +32,9 @@ class ProductService {
         return productRepository.save(product)
     }
 
-    void deleteProduct(String sku) {
+    Response deleteProduct(String sku) {
         productRepository.delete(sku)
+        return Response.ok().build()
     }
 
     Response reduceInventory(Inventory[] inventoryAdjustment) {
@@ -59,10 +60,11 @@ class ProductService {
         return Response.ok().build()
     }
 
-    void addKeywordsToProduct(String sku, List<String> keywords) {
+    Response addKeywordsToProduct(String sku, List<String> keywords) {
 
         Product product = getProduct(sku)
         product.setKeywords(keywords)
         saveProduct(product)
+        return Response.ok().build()
     }
 }

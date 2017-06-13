@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.ws.rs.WebApplicationException
+import javax.ws.rs.core.Response
 
 @Component
 class CustomerService {
@@ -33,8 +34,9 @@ class CustomerService {
         return customerRepository.save(customer)
     }
 
-    void deleteCustomer(String customerId) {
+    Response deleteCustomer(String customerId) {
         customerRepository.delete(customerId)
+        return Response.ok().build()
     }
     
     Customer authenticate(Customer customer) {
@@ -58,8 +60,9 @@ class CustomerService {
         return orderRepository.save(order)
     }
 
-    void deleteOrder(String orderId) {
+    Response deleteOrder(String orderId) {
         orderRepository.delete(orderId)
+        return Response.ok().build()
     }
 
     OrderItem getOrderItem(String orderItemId) {
@@ -81,7 +84,8 @@ class CustomerService {
         return result
     }
 
-    void deleteOrderItem(String orderItemId) {
+    Response deleteOrderItem(String orderItemId) {
         orderItemRepository.delete(orderItemId)
+        return Response.ok().build()
     }
 }
