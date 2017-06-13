@@ -114,6 +114,14 @@ class AdminService {
         OrderItem newOrderItem = new OrderItem()
         newOrderItem.setQuantity(1)
 
+        Transaction transaction = new Transaction()
+        transaction.customerId = customer.id
+        transaction.orderNumber = order.id
+        transaction.amount = 100.99
+        transaction.creditCardNumber = 123457890123456
+        transaction.expYear = 2030
+        transaction.expMonth = 1
+
         // save new customer
         uri("customers")
         customer = (Customer) doPut(customer, Customer.class)
@@ -264,14 +272,7 @@ class AdminService {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(orderItemRepository.findOne(orderItem.id))
 
-        //test process
-        Transaction transaction = new Transaction()
-        transaction.customerId = customer.id
-        transaction.orderNumber = order.id
-        transaction.amount = 100.99
-        transaction.creditCardNumber = 123457890123456
-        transaction.expYear = 2030
-        transaction.expMonth = 1
+        //test billing process
         uri("billing", "process")
         Result result = (Result) doPost(transaction, Result.class)
         Assert.assertEquals(result.status, Result.Status.SUCCESS)
@@ -279,7 +280,7 @@ class AdminService {
         result = (Result) doPost(transaction, Result.class)
         Assert.assertEquals(result.status, Result.Status.FAILURE)
 
-        //test refund
+        //test billing refund
         uri("billing", "refund", "123")
         response = doSilentGet()
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
