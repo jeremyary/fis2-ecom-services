@@ -32,6 +32,13 @@
             <artifactId>spring-data-commons</artifactId>
             <version>${spring-data-commons.version}</version>
         </dependency>
+
+        <!-- ws.rs -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
