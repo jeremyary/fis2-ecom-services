@@ -59,7 +59,7 @@ class AppRoute extends SpringRouteBuilder {
 
         rest("/billing/refund/{transactionNumber}").description("billing refunds endpoint")
                 .consumes(MediaType.APPLICATION_JSON)
-                .post()
+                .get()
                     .description("process refund")
                     .param().name("transactionNumber").type(RestParamType.path)
                     .description("transactionNumber to be refunded").endParam()
