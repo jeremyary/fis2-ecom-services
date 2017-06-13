@@ -18,6 +18,8 @@ package com.redhat.refarch.ecom.service
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.redhat.refarch.ecom.model.Customer
+import com.redhat.refarch.ecom.model.Order
+import com.redhat.refarch.ecom.model.OrderItem
 import com.redhat.refarch.ecom.model.Product
 import com.redhat.refarch.ecom.repository.CustomerRepository
 import com.redhat.refarch.ecom.repository.OrderItemRepository
@@ -146,6 +148,60 @@ class AdminService {
             Assert.assertTrue(products.size() > 0)
             Assert.assertThat(products, IsIterableContainingInAnyOrder.containsInAnyOrder(fetchedProducts.toArray()))
 
+            // get product to check availability
+            Product fetchedProduct = fetchedProducts.get(0)
+            uriBuilder = getUriBuilder("products", fetchedProduct.getSku())
+            get = new HttpGet(uriBuilder.build())
+            Product product = gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Product.class)
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(products)
+            Assert.assertEquals(product, fetchedProduct)
+
+            // add initial order
+            Order newOrder = new Order()
+            newOrder.setStatus(Order.Status.Initial)
+            uriBuilder = getUriBuilder("customers", customer.id, "orders")
+            post = new HttpPost(uriBuilder.build())
+            post.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
+            Order order = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), Order.class)
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(order)
+            Order fetchedOrder = orderRepository.findOne(order.id)
+            Assert.assertEquals(order, fetchedOrder)
+
+            // add order item
+            OrderItem newOrderItem = new OrderItem()
+            newOrderItem.setSku(product.sku)
+            newOrderItem.setQuantity(1)
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
+            post = new HttpPost(uriBuilder.build())
+            post.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
+            OrderItem orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), OrderItem
+                    .class)
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(orderItem)
+            OrderItem fetchedOrderItem = orderItemRepository.findOne(orderItem.id)
+            Assert.assertEquals(orderItem, fetchedOrderItem)
+            fetchedOrder = orderRepository.findOne(fetchedOrder.id)
+            Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
+            Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
+
+            // update order item
+            newOrderItem.setQuantity(3)
+            uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
+            patch = new HttpPatch(uriBuilder.build())
+            patch.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
+            orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), OrderItem.class)
+            Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            Assert.assertNotNull(orderItem)
+            fetchedOrderItem = orderItemRepository.findOne(orderItem.id)
+            Assert.assertEquals(orderItem, fetchedOrderItem)
+            Assert.assertTrue(fetchedOrderItem.quantity == 3)
+            fetchedOrder = orderRepository.findOne(fetchedOrder.id)
+            Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
+            Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
+
+            
         } catch (Exception e) {
             e.printStackTrace()
         }

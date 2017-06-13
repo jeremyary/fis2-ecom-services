@@ -8,7 +8,7 @@ class OrderItem {
 
     @Id
     String id
-    Long sku
+    String sku
     Integer quantity
 
     OrderItem() {}
