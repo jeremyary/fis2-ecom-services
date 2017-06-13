@@ -165,7 +165,7 @@ class AdminService {
             Assert.assertEquals(product, fetchedProduct)
 
             // add keywords to product
-            uriBuilder = getUriBuilder("products", product.sku)
+            uriBuilder = getUriBuilder("products", product.sku, "keywords")
             post = new HttpPost(uriBuilder.build())
             String[] keywords = ["Electronics", "TV"]
             post.setEntity(new StringEntity(gson.toJson(keywords).toString(), ContentType.APPLICATION_JSON))
@@ -226,9 +226,9 @@ class AdminService {
             Order newOrder = new Order()
             newOrder.setStatus(Order.Status.Initial)
             uriBuilder = getUriBuilder("customers", customer.id, "orders")
-            post = new HttpPost(uriBuilder.build())
-            post.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
-            Order order = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), Order.class)
+            put = new HttpPut(uriBuilder.build())
+            put.setEntity(new StringEntity(gson.toJson(newOrder).toString(), ContentType.APPLICATION_JSON))
+            Order order = gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), Order.class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             Assert.assertNotNull(order)
             Order fetchedOrder = orderRepository.findOne(order.id)
@@ -239,9 +239,9 @@ class AdminService {
             newOrderItem.setSku(product.sku)
             newOrderItem.setQuantity(1)
             uriBuilder = getUriBuilder("customers", customer.id, "orders", order.id, "orderItems")
-            post = new HttpPost(uriBuilder.build())
-            post.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
-            OrderItem orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), OrderItem
+            put = new HttpPut(uriBuilder.build())
+            put.setEntity(new StringEntity(gson.toJson(newOrderItem).toString(), ContentType.APPLICATION_JSON))
+            OrderItem orderItem = gson.fromJson(EntityUtils.toString(httpClient.execute(put).getEntity()), OrderItem
                     .class)
             Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             Assert.assertNotNull(orderItem)
@@ -265,6 +265,10 @@ class AdminService {
             fetchedOrder = orderRepository.findOne(fetchedOrder.id)
             Assert.assertTrue(fetchedOrder.orderItemIds.size() == 1)
             Assert.assertTrue(fetchedOrder.orderItemIds.contains(fetchedOrderItem.id))
+
+            // update order
+
+            // delete order
 
 
         } catch (Exception e) {
