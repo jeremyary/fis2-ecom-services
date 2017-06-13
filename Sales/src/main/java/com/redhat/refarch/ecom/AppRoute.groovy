@@ -44,7 +44,6 @@ class AppRoute extends SpringRouteBuilder {
 
         from("amq:customers.delete")
                 .bean(customerService, 'deleteCustomer(${header.customerId})')
-                .marshal().json(JsonLibrary.Jackson)
 
         from("amq:customers.authenticate")
                 .unmarshal().json(JsonLibrary.Jackson, Customer.class)

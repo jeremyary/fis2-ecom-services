@@ -34,9 +34,8 @@ class CustomerService {
         return customerRepository.save(customer)
     }
 
-    Response deleteCustomer(String customerId) {
+    void deleteCustomer(String customerId) {
         customerRepository.delete(customerId)
-        return Response.ok().build()
     }
     
     Customer authenticate(Customer customer) {

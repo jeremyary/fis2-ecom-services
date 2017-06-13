@@ -41,6 +41,8 @@ import org.junit.Assert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import javax.ws.rs.core.Response
+
 @Component
 class AdminService {
 
@@ -99,7 +101,6 @@ class AdminService {
         uriBuilder = getUriBuilder("customers", fetchedCustomer.id)
         HttpGet get = new HttpGet(uriBuilder.build())
         customer =  gson.fromJson(EntityUtils.toString(httpClient.execute(get).getEntity()), Customer.class)
-        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
         Assert.assertEquals(customer, fetchedCustomer)
 
@@ -108,14 +109,14 @@ class AdminService {
         HttpPost post = new HttpPost(uriBuilder.build())
         post.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
         customer = gson.fromJson(EntityUtils.toString(httpClient.execute(post).getEntity()), Customer.class)
-        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
         Assert.assertEquals(customer, fetchedCustomer)
 
         // delete customer
         uriBuilder = getUriBuilder("customers", customer.getId())
         HttpDelete delete = new HttpDelete(uriBuilder.build())
-        httpClient.execute(delete)
+        response = httpClient.execute(delete)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(customerRepository.getByUsername("bobdole"))
 
         // patch customer
@@ -124,7 +125,6 @@ class AdminService {
         patch.setEntity(new StringEntity(gson.toJson(customer).toString(), ContentType.APPLICATION_JSON))
         customer = gson.fromJson(EntityUtils.toString(httpClient.execute(patch).getEntity()), Customer.class)
         fetchedCustomer = customerRepository.getByUsername("bobdole")
-        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNotNull(customer)
         Assert.assertEquals(customer, fetchedCustomer)
 
