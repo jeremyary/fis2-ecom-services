@@ -282,6 +282,23 @@ objects:
     sessionAffinity: None
     type: LoadBalancer
 - apiVersion: v1
+  kind: Route
+  metadata:
+    name: broker-amq-ingress
+    namespace: ecom-services
+    labels:
+      app: amq62-basic
+      template: amq62-basic
+  spec:
+    host: ${AMQ_ROUTE}
+    to:
+      kind: Service
+      name: broker-amq-ingress
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+- apiVersion: v1
   data:
     database-admin-password: cGFzc3dvcmQ=
     database-password: cGFzc3dvcmQ=
