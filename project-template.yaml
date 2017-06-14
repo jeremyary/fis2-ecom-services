@@ -268,6 +268,43 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
+apiVersion: v1
+kind: Template
+metadata:
+  name: broker-ingress-template
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: amq62-basic
+      template: amq62-basic
+    name: broker-amq-ingress
+  spec:
+    ports:
+    - nodePort: 30616
+      port: 61616
+      protocol: TCP
+      targetPort: 61616
+    selector:
+      deploymentConfig: broker-amq
+    sessionAffinity: None
+    type: LoadBalancer
+- apiVersion: v1apiVersion: v1
+  kind: Route
+  metadata:
+    name: broker-amq-ingress
+    namespace: ecom-services
+    labels:
+      app: amq62-basic
+      template: amq62-basic
+  spec:
+    host: ${AMQ_ROUTE}
+    to:
+      kind: Service
+      name: broker-amq-ingress
+      weight: 100
+    wildcardPolicy: None
 - apiVersion: v1
   data:
     database-admin-password: cGFzc3dvcmQ=
@@ -378,6 +415,40 @@ objects:
       name: mongodb
     sessionAffinity: None
     type: ClusterIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name":"mongodb","namespace":"","kind":"Service"}]'
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+    name: mongo-ingress
+  spec:
+    ports:
+    - nodePort: 30918
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      name: mongodb
+    sessionAffinity: None
+    type: LoadBalancer
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: mongo-ingress
+    namespace: ecom-services
+    labels:
+      app: mongodb-ephemeral
+      template: mongodb-ephemeral-template
+  spec:
+    host: ${MONGO_ROUTE}
+    to:
+      kind: Service
+      name: mongo-ingress
+      weight: 100
+    wildcardPolicy: None
 - apiVersion: v1
   kind: BuildConfig
   metadata:
@@ -819,6 +890,22 @@ objects:
       app: gateway-service
       deploymentconfig: gateway-service
 - apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: gateway-service
+    name: gateway-service
+  spec:
+    host: ${GATEWAY_ROUTE}
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: gateway-service
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     labels:
@@ -1072,3 +1159,12 @@ parameters:
   - name: GATEWAY_HOST
     description: API gateway host
     value: gateway-service
+  - name: GATEWAY_ROUTE
+    description: route URL for gateway
+    value: ecom.rhmap.ose
+  - name: AMQ_ROUTE
+    description: route URL for A-MQ
+    value: amq.rhmap.ose
+  - name: MONGO_ROUTE
+    description: route URL for mongo
+    value: mongo.rhmap.ose
