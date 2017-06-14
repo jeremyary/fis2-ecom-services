@@ -1059,7 +1059,7 @@ parameters:
     value: mongo-service
   - name: MONGO_PORT
     description: MongoDB Host Port
-    value: 27017
+    value: "27017"
   - name: MONGO_DB
     description: MongoDB Collection
     value: ecom
