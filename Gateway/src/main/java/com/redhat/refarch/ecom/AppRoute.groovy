@@ -279,10 +279,13 @@ class AppRoute extends SpringRouteBuilder {
                     .responseMessage().code(200).message("products with keyword fetched").endResponseMessage()
                     .to("amq:products.list.keyword?transferException=true")
 
-        rest("admin/reset")
-                .get().to("amq:admin.reset?transferException=true")
+        rest("demo/reset")
+                .get()
+                    .description("reset demo dataset - removes all customers/orders, builds basic product set")
+                    .responseMessage().code(200).message("demo dataset reset").endResponseMessage()
+                    .to("amq:admin.reset?transferException=true")
 
-        rest("admin/testApi")
+        rest("demo/testApi")
                 .get().to("amq:admin.testApi?transferException=true")
     }
 }

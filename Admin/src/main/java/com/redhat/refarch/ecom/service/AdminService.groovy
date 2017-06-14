@@ -40,6 +40,7 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder
 import org.hamcrest.collection.IsIterableContainingInOrder
 import org.junit.Assert
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
@@ -56,6 +57,9 @@ class AdminService {
 
     @Autowired
     OrderItemRepository orderItemRepository
+
+    @Value('${gateway.host:gateway-service}')
+    String gatewayHost
 
     URIBuilder uriBuilder
 
@@ -284,6 +288,8 @@ class AdminService {
         uri("billing", "refund", "123")
         response = doSilentGet()
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+
+        println ">>>>> TESTS COMPLETE: API tests successful <<<<<"
     }
 
     private Object doPut(Object objToMarshal, Class clazz) {
@@ -341,7 +347,7 @@ class AdminService {
         if (uriBuilder == null) {
             uriBuilder = new URIBuilder()
                     .setScheme("http")
-                    .setHost("ecom.rhmap.ose")
+                    .setHost(gatewayHost)
         }
 
         stringWriter.buffer.length = 0
