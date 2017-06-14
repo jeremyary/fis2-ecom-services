@@ -62,6 +62,10 @@ objects:
       type: Docker
     triggers:
     - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: fis-java-openshift:2.0
+          namespace: openshift
       type: ImageChange
 - apiVersion: v1
   kind: ServiceAccount
