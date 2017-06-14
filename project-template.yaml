@@ -835,7 +835,7 @@ objects:
   spec:
     host: ${GATEWAY_ROUTE}
     port:
-      targetPort: 8080-tcp
+      targetPort: 9091-tcp
     to:
       kind: Service
       name: gateway-service
