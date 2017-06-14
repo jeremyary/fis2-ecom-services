@@ -19,6 +19,7 @@
         <java.target.version>1.8</java.target.version>
         <spring-boot.version>1.5.3.RELEASE</spring-boot.version>
         <spring-data.version>1.10.3.RELEASE</spring-data.version>
+        <spring-data-commons.version>1.12.3.RELEASE</spring-data-commons.version>
 
         <fabric8.maven.plugin.version>3.1.80.redhat-000010</fabric8.maven.plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -91,6 +92,12 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>${spring-data-commons.version}</version>
+        </dependency>
 
         <!-- Enabling health checks -->
         <dependency>
