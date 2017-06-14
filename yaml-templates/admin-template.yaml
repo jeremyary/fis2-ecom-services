@@ -124,7 +124,7 @@ parameters:
     value: gateway-service
   - name: MONGO_HOST
     description: MongoDB Host
-    value: mongo-service
+    value: mongodb
   - name: MONGO_PORT
     description: MongoDB Host Port
     value: 27017
