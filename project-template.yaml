@@ -1097,10 +1097,10 @@ parameters:
     value: gateway-service
   - name: GATEWAY_ROUTE
     description: route URL for gateway
-    value: ecom.rhmap.ose
+    value: api.example.com
   - name: AMQ_ROUTE
     description: route URL for A-MQ
-    value: amq.rhmap.ose
+    value: amq.example.com
   - name: MONGO_ROUTE
     description: route URL for mongo
-    value: mongo.rhmap.ose
+    value: mongo.example.com
