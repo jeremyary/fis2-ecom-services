@@ -61,6 +61,9 @@ class AdminService {
     @Value('${gateway.host:gateway-service}')
     String gatewayHost
 
+    @Value('${gateway.port:9091}')
+    Integer gatewayPort
+
     URIBuilder uriBuilder
 
     CloseableHttpClient httpClient
@@ -348,6 +351,7 @@ class AdminService {
             uriBuilder = new URIBuilder()
                     .setScheme("http")
                     .setHost(gatewayHost)
+                    .setPort(gatewayPort)
         }
 
         stringWriter.buffer.length = 0
