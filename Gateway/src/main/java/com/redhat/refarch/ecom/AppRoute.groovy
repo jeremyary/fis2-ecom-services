@@ -314,6 +314,9 @@ class AppRoute extends SpringRouteBuilder {
                     .to("amq:admin.reset?transferException=true")
 
         rest("/demo/testApi")
-                .get().to("amq:admin.testApi?transferException=true")
+                .get()
+                    .description("test API endpoints")
+                    .responseMessage().code(200).message("API test successful").endResponseMessage()
+                    .to("amq:admin.testApi?transferException=true")
     }
 }
