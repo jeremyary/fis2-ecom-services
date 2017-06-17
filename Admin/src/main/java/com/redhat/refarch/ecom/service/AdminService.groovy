@@ -129,7 +129,7 @@ class AdminService {
 
         // save new customer
         uri("customers")
-        customer = (Customer) doPut(customer, Customer.class)
+        customer = (Customer) doPost(customer, Customer.class)
         Assert.assertNotNull(customer)
         Assert.assertNotNull(customer.id)
         Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
@@ -152,6 +152,12 @@ class AdminService {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(customerRepository.getByUsername("bobdole"))
 
+        // put customer
+        uri("customers")
+        customer = (Customer) doPut(customer, Customer.class)
+        Assert.assertNotNull(customer)
+        Assert.assertEquals(customer, customerRepository.getByUsername("bobdole"))
+
         // patch customer
         uri("customers")
         customer = (Customer) doPatch(customer, Customer.class)
@@ -160,7 +166,7 @@ class AdminService {
 
         // add product
         uri("products")
-        Product product = (Product) doPut(newProduct, Product.class)
+        Product product = (Product) doPost(newProduct, Product.class)
         Assert.assertNotNull(product)
         newProduct.setSku(product.sku)
         Assert.assertEquals(product, newProduct)
@@ -184,7 +190,14 @@ class AdminService {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(productRepository.findOne(product.sku))
 
-        // update product
+        // put product
+        uri("products")
+        product.setDescription("bar")
+        product = (Product) doPut(newProduct, Product.class)
+        Assert.assertNotNull(product)
+        Assert.assertTrue(product.description == "bar")
+
+        // patch product
         product.setDescription("foo")
         uri("products")
         product = (Product) doPatch(product, Product.class)
@@ -213,9 +226,9 @@ class AdminService {
         Assert.assertEquals(product, productRepository.findOne(product.sku))
         Assert.assertEquals(product.availability, productRepository.findOne(product.sku).availability)
 
-        // add initial order
+        // add order
         uri("customers", customer.id, "orders")
-        Order order = (Order) doPut(newOrder, Order.class)
+        Order order = (Order) doPost(newOrder, Order.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertEquals(order, orderRepository.findOne(order.id))
 
@@ -231,7 +244,14 @@ class AdminService {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertNull(orderRepository.findOne(order.id))
 
-        // update order
+        // put order
+        order.setStatus(Order.Status.Paid)
+        uri("customers", customer.id, "orders")
+        order = (Order) doPut(newOrder, Order.class)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertEquals(order, orderRepository.findOne(order.id))
+
+        // patch order
         order.setStatus(Order.Status.InProgress)
         uri("customers", customer.id, "orders")
         order = (Order) doPatch(order, Order.class)
@@ -241,14 +261,25 @@ class AdminService {
         // add order item
         newOrderItem.sku = product.sku
         uri("customers", customer.id, "orders", order.id, "orderItems")
-        OrderItem orderItem = (OrderItem) doPut(newOrderItem, OrderItem.class)
+        OrderItem orderItem = (OrderItem) doPost(newOrderItem, OrderItem.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
         order = orderRepository.findOne(order.id)
         Assert.assertTrue(order.orderItemIds.size() == 1)
         Assert.assertTrue(order.orderItemIds.contains(orderItem.id))
 
-        // update order item
+        // put order item
+        orderItem.quantity = 5
+        uri("customers", customer.id, "orders", order.id, "orderItems")
+        orderItem = (OrderItem) doPut(newOrderItem, OrderItem.class)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
+        Assert.assertTrue(orderItem.quantity == 5)
+        order = orderRepository.findOne(order.id)
+        Assert.assertTrue(order.orderItemIds.size() == 1)
+        Assert.assertTrue(order.orderItemIds.contains(orderItem.id))
+
+        // patch order item
         orderItem.quantity = 3
         uri("customers", customer.id, "orders", order.id, "orderItems")
         orderItem = (OrderItem) doPatch(orderItem, OrderItem.class)
