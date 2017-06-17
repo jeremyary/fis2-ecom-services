@@ -193,7 +193,7 @@ class AdminService {
         // put product
         uri("products")
         product.setDescription("bar")
-        product = (Product) doPut(newProduct, Product.class)
+        product = (Product) doPut(product, Product.class)
         Assert.assertNotNull(product)
         Assert.assertTrue(product.description == "bar")
 
@@ -247,7 +247,7 @@ class AdminService {
         // put order
         order.setStatus(Order.Status.Paid)
         uri("customers", customer.id, "orders")
-        order = (Order) doPut(newOrder, Order.class)
+        order = (Order) doPut(order, Order.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertEquals(order, orderRepository.findOne(order.id))
 
@@ -271,7 +271,7 @@ class AdminService {
         // put order item
         orderItem.quantity = 5
         uri("customers", customer.id, "orders", order.id, "orderItems")
-        orderItem = (OrderItem) doPut(newOrderItem, OrderItem.class)
+        orderItem = (OrderItem) doPut(orderItem, OrderItem.class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         Assert.assertEquals(orderItem, orderItemRepository.findOne(orderItem.id))
         Assert.assertTrue(orderItem.quantity == 5)
