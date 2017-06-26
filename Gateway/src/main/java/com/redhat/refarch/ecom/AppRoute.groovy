@@ -15,11 +15,7 @@
  */
 package com.redhat.refarch.ecom
 
-import com.redhat.refarch.ecom.model.Customer
-import com.redhat.refarch.ecom.model.Order
-import com.redhat.refarch.ecom.model.OrderItem
-import com.redhat.refarch.ecom.model.Product
-import com.redhat.refarch.ecom.model.Result
+import com.redhat.refarch.ecom.model.*
 import org.apache.camel.model.rest.RestParamType
 import org.apache.camel.spring.SpringRouteBuilder
 import org.springframework.stereotype.Component
@@ -240,9 +236,9 @@ class AppRoute extends SpringRouteBuilder {
         rest("/products").description("products endpoint")
                 .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
                 .get()
-                    .description("list featured products").outTypeList(Product.class)
-                    .responseMessage().code(200).message("featured products fetched").endResponseMessage()
-                    .to("amq:products.list.featured?transferException=true")
+                    .description("list products").outTypeList(Product.class)
+                    .responseMessage().code(200).message("products fetched").endResponseMessage()
+                    .to("amq:products.list.all?transferException=true")
                 .post()
                     .description("save new product").outType(Product.class)
                     .param().name("product").type(RestParamType.body)
@@ -262,6 +258,13 @@ class AppRoute extends SpringRouteBuilder {
                     .responseMessage().code(200).message("product updated").endResponseMessage()
                     .to("amq:products.save?transferException=true")
 
+        rest("/products/featured").description("featured products endpoint")
+                .consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
+                .get()
+                    .description("list featured products").outTypeList(Product.class)
+                    .responseMessage().code(200).message("featured products fetched").endResponseMessage()
+                    .to("amq:products.list.featured?transferException=true")
+
         rest("/products/{sku}").description("individual product endpoint")
                 .consumes(MediaType.TEXT_PLAIN).produces(MediaType.APPLICATION_JSON)
                 .get()
@@ -277,13 +280,12 @@ class AppRoute extends SpringRouteBuilder {
                     .responseMessage().code(200).message("product deleted").endResponseMessage()
                     .to("amq:products.delete?transferException=true")
 
-        rest("/products/{sku}/reduce/{quantity}")
-                .get()
+        rest("/products/reduction")
+                .consumes(MediaType.APPLICATION_JSON)
+                .post()
                     .description("reduce product inventory")
-                    .param().name("sku").type(RestParamType.path)
-                    .description("product to reduce").endParam()
-                    .param().name("quantity").type(RestParamType.path)
-                    .description("reduction quantity").endParam()
+                    .param().name("orderItems").type(RestParamType.body)
+                    .description("orderItems to reduce").endParam()
                     .responseMessage().code(200).message("product inventory reduced").endResponseMessage()
                     .to("amq:products.reduce?transferException=true")
 

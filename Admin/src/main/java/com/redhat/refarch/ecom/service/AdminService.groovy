@@ -179,10 +179,14 @@ class AdminService {
         Assert.assertTrue(product.getKeywords().containsAll(["Electronics", "TV"]))
 
         // reduce product
-        uri("products", product.sku, "reduce", "1")
-        response = doSilentGet()
+        OrderItem item1 = new OrderItem()
+        item1.id = null
+        item1.sku = product.sku
+        item1.quantity = 2
+        uri("products", "reduction")
+        response = doSilentPost([item1])
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-        Assert.assertTrue(productRepository.findOne(product.sku).getAvailability() == 4)
+        Assert.assertTrue(productRepository.findOne(product.sku).getAvailability() == 3)
 
         // delete product
         uri("products", product.sku)
@@ -204,11 +208,18 @@ class AdminService {
         Assert.assertNotNull(product)
         Assert.assertTrue(product.description == "foo")
 
-        // list featured products
+        // list products
         uri("products")
         List<Product> products = doGetList(Product[].class)
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
-        Assert.assertThat(products, IsIterableContainingInOrder.contains(
+        Assert.assertThat(products, IsIterableContainingInAnyOrder.containsInAnyOrder(
+                productRepository.findAll().toArray()))
+
+        // list featured products
+        uri("products", "featured")
+        products = doGetList(Product[].class)
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        Assert.assertThat(products, IsIterableContainingInAnyOrder.containsInAnyOrder(
                 productRepository.findByIsFeatured(true).toArray()))
 
         // list products by keyword
@@ -323,6 +334,7 @@ class AdminService {
         response = doSilentGet()
         Assert.assertTrue(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
 
+        resetData()
         println ">>>>> TESTS COMPLETE: API tests successful <<<<<"
     }
 
