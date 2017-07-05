@@ -1,25 +1,51 @@
 package com.redhat.refarch.ecom.model
 
 import groovy.transform.EqualsAndHashCode
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import org.springframework.data.annotation.Id
 
 import java.math.RoundingMode
 
 @EqualsAndHashCode
+@ApiModel(description = "Represents a product in the system")
 class Product {
 
     @Id
+    @ApiModelProperty(value = "Persistence ID of product", required = false)
     String sku
+
+    @ApiModelProperty(value = "Name of product", required = true)
     String name
+
+    @ApiModelProperty(value = "Description of product", required = true)
     String description
+
+    @ApiModelProperty(value = "Imperial length dimension of product", required = true)
     Double length
+
+    @ApiModelProperty(value = "Imperial width dimension of product", required = true)
     Double width
+
+    @ApiModelProperty(value = "Imperial height dimension of product", required = true)
     Double height
+
+    @ApiModelProperty(value = "Imperial weight measurement of product", required = true)
     Double weight
+
+    @ApiModelProperty(value = "Flag indicating if product is to be specially advertised as featured", required = true)
     Boolean isFeatured
+
+    @ApiModelProperty(value = "Quantity of product available for purchase", required = true)
     Integer availability
+
+    @ApiModelProperty(value = "Price of a single product unit", required = true)
     BigDecimal price
+
+    @ApiModelProperty(value = "Visual representation identifier for product", required = true)
     String image
+
+    @ApiModelProperty(value = "Keywords which categorize the product", required = true)
     List<String> keywords = []
 
     Product() {}
