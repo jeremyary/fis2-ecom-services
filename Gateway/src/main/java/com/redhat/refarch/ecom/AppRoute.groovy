@@ -30,7 +30,7 @@ class AppRoute extends SpringRouteBuilder {
     void configure() throws Exception {
 
         restConfiguration().component("spark-rest")
-                .host("api.example.com")
+                .host("0.0.0.0")
                 .port(9091)
                 .apiContextPath("/api-doc")
                 .apiProperty("api.title", "E-Commerce API Gateway")
