@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component
 
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
-import java.util.logging.Logger
 
 @Component
 class AppRoute extends SpringRouteBuilder {
@@ -35,8 +34,6 @@ class AppRoute extends SpringRouteBuilder {
 
     @Value('${gateway.token.value:#{null}}')
     String tokenValue
-
-    Logger logger = Logger.getLogger(AppRoute.class.name)
 
     @Override
     void configure() throws Exception {
