@@ -16,18 +16,49 @@
 package com.redhat.refarch.ecom
 
 import com.redhat.refarch.ecom.model.*
+import org.apache.camel.Exchange
+import org.apache.camel.Processor
 import org.apache.camel.model.rest.RestParamType
 import org.apache.camel.spring.SpringRouteBuilder
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+import java.util.logging.Logger
 
 @Component
 class AppRoute extends SpringRouteBuilder {
 
+    @Value('${gateway.token.header:X-3scale-proxy-secret-token}')
+    String tokenHeader
+
+    @Value('${gateway.token.value:#{null}}')
+    String tokenValue
+
+    Logger logger = Logger.getLogger(AppRoute.class.name)
+
     @Override
     void configure() throws Exception {
+
+        if (tokenValue != null && tokenHeader != null) {
+
+            logger.info("AUTH TOKEN REQUIREMENT DETECTED: [${tokenHeader}] adding security route interceptor")
+            interceptFrom().id("auth token interceptor").process(new Processor() {
+                @Override
+                void process(Exchange exchange) throws Exception {
+
+                    if (exchange.in.getHeader(tokenHeader) == null
+                            || exchange.in.getHeader(tokenHeader) != tokenValue) {
+
+                        logger.info("Authorization token required, but header missing or invalid")
+                        exchange.out.setHeader(Exchange.HTTP_RESPONSE_CODE, 403)
+                        exchange.out.setBody("Unauthorized [missing or invalid token]")
+                        exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE)
+                    }
+                }
+            })
+        }
 
         restConfiguration().component("spark-rest")
                 .host("0.0.0.0")
